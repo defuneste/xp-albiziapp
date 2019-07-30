@@ -14,7 +14,7 @@ library(ggmap) # outils pour les cartes statics avec tuiles
 library(gganimate) # animation avec ggplot et map
 library(spatstat) # outils d'analyse point pattern
 library(maptools) # des outils principalements de conversion
-library(purrr)
+library(purrr) # prog fonctionnel en tidyverse
 
 
 ### stream du json

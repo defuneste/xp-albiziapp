@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 *.Rproj
+# le fichier de jeux de données
+/data
