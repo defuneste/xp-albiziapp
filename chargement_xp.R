@@ -108,5 +108,10 @@ df_bota$common <- unlist(df_bota$common)
 df_bota$specie <- unlist(df_bota$specie)
 df_bota$genus <- unlist(df_bota$genus)
 
-
 newObservation.df <- bind_cols(newObservation.df, df_bota) %>% select(-"authorName")
+
+# on sauve 
+#st_write(newObservation.df, "data/newObservation.geojson")
+
+# ici lecture du fichier après vérification de la bota dans qgis
+xp-bota.shp <- st_read("data/newObservation.geojson") 

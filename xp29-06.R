@@ -3,6 +3,9 @@
 ##.#################################################################################33
 
 
+source("chargement_xp.R")
+
+
 library(tidyverse) # envt pour des donnees de type tidy pas trop volumineuse
 library(tmap) # cartes statics
 library(tmaptools) # outils de carte dont palette_color
@@ -14,33 +17,8 @@ library(maptools) # des outils principalements de conversion
 library(purrr) # prog fonctionnel en tidyverse
 
 
-source("chargement_xp.R")
-
-
-# . -------------------------------------------------------------------------- =============
-# I - Nettoyage / mise en forme ----------------------------------------------------------------- =============
-# . -------------------------------------------------------------------------- =============
-
-# "date" On est pas tout à fait sur le bon creneau horaires, la tz doit pas être bonne je pense quil faut rajouter 2 h 
-# on est pas non plus obliger de garer la date et on peut juste travailler en hms
-
-table(exp_brut$event, exp_brut$activity$index)
-
-## 1 - Recup des données ================
-
-
-# on ne garde que ceux dans les limites de zones, attention je suis en lat/long
-
-# . -------------------------------------------------------------------------- =============
-# II - Je ne prends que "newObservation" ----------------------------------------------------------------- =============
-# . -------------------------------------------------------------------------- =============
-
-
 
 # ici il n'y a que trois variable exportées, pb  
-st_write(newObservation.df, "data/newObservation.geojson")
-
-bota.df <- st_read("data/newObservation.geojson") 
 
 summary(bota.df)
 
