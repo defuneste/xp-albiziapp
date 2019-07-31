@@ -23,6 +23,10 @@ zone.shp <- st_read("data/zone_se.shp") # ouverture du fichier de zone
 zone.shp <- zone.shp[zone.shp$id ==1, ] # il y avait deux zones à la base au final je n'ai pris que la première
 # plot(zone.shp)
 
+# point de départ de l'experimentation 
+
+mixeur.shp <- st_point(c(4.3860717, 45.4496287), dim = "XY") # localisation du mixeur
+
 # on prend les arbres que l'on connait 
 arbre_xp.shp <- st_read("data/arbres_se_final.geojson")
 # limité à la zone

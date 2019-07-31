@@ -3,9 +3,19 @@
 ##.#################################################################################33
 
 
+
+# . -------------------------------------------------------------------------- =============
+# I - Chargement de packages supplementaire et des données  ----------------------------------------------------------------- =============
+# . -------------------------------------------------------------------------- =============
+
+
+## 1 - Données  =======
+
 source("chargement_xp.R")
 
+## 2 - Package supplemtaire  =======
 
+#attention certaines fonctions sont masquées 
 library(tidyverse) # envt pour des donnees de type tidy pas trop volumineuse
 library(tmap) # cartes statics
 library(tmaptools) # outils de carte dont palette_color
@@ -16,11 +26,9 @@ library(spatstat) # outils d'analyse point pattern
 library(maptools) # des outils principalements de conversion
 library(purrr) # prog fonctionnel en tidyverse
 
-
-
-# ici il n'y a que trois variable exportées, pb  
-
-summary(bota.df)
+# . -------------------------------------------------------------------------- =============
+# II - Carte + stats   ----------------------------------------------------------------- =============
+# . -------------------------------------------------------------------------- =============
 
 ## 1 - Une carte des nouvelle obs  =======
 
@@ -43,19 +51,18 @@ addLegend(position = "bottomright",
 
 carto_SE
 
-
-# une carte animée
+## 2 - Une carte annimée  =======
 
 # il faut aller dans gif_xp.R
 
-## 2 - Temporalité ==============
+## 3 - Temporalité ==============
 # à travailler
 
 plot(newObservation.df$date)
 
 strftime(newObservation.df$date, format="%H:%M:%S")
 
-## 3 - Activité/personne ================
+## 4 - Activité/personne ================
 
 table(newObservation.df$username, newObservation.df$code_activ)
 
@@ -65,21 +72,8 @@ ggplot(aes(x = code_activ, fill = username)) +
     labs(x ="Activités",
          y ="Nombre de relevés") 
 
-# . -------------------------------------------------------------------------- =============
-# II - On refait une carte  ----------------------------------------------------------------- =============
-# . -------------------------------------------------------------------------- =============
 
-
-## 1 - Recup des données ================
-
-
-# on ne garde que ceux dans les limites de zones, attention je suis en lat/long
-
-plot(st_geometry(arbre_xp_zone.shp))
-
-summary(arbre_xp_zone.shp)
-
-## 2 - nndist ================
+## 5 - nndist ================
 
 newObservation_zone.df <- newObservation.df[zone.shp,]
 
@@ -117,7 +111,7 @@ newObservation_zone.df %>%
 
 ## 1 - Effet du point de départ  ================
 
-# x = 4.3860717, y = 45.4496287), size = 4, pch = "M") +# localisation mixeur
+
 
 # tester différentes distance par rapport à lui
 
