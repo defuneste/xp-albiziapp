@@ -8,6 +8,8 @@ library(jsonlite) # pour les json
 library(sp) # ancien package spatial toujours présent
 library(sf) # package spatial
 library(lubridate) # les dates 
+library(forcats) # pour les facteurs
+library(dplyr) # manip données
 
 ## 2 - Les données ================
 
@@ -122,6 +124,23 @@ xp_bota.shp <- st_read("data/newObservation.geojson")
 
 ## 3 - Modification du fichier avec bota ================
 
+# anonimisation 
+xp_bota.shp$participant <- "A"
+xp_bota.shp$participant[xp_bota.shp$username == "tjoliveau"] <- "B"
+xp_bota.shp$participant[xp_bota.shp$username == "JitenshaNiko"] <- "C"
+xp_bota.shp$participant[xp_bota.shp$username == "MathDu"] <- "D"
+xp_bota.shp$participant[xp_bota.shp$username == "Yoann Duriaux"] <- "E"
+xp_bota.shp$participant[xp_bota.shp$username == "pofx"] <- "F"
+xp_bota.shp$participant[xp_bota.shp$username == "Catherine JHG"] <- "G"
+
+# attribution de 6 pour un relevé hors activité
+xp_bota.shp$code_activ[is.na(xp_bota.shp$code_activ)] <- 6
+
+# un factor
 xp_bota.shp$code_activ <- as.factor(xp_bota.shp$code_activ)
 
-xp_bota.shp[is.na(xp_bota.shp$code_activ),]
+xp_bota.shp <- xp_bota.shp %>% 
+  mutate(participant = fct_infreq(participant))
+
+
+

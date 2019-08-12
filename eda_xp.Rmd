@@ -9,10 +9,34 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+source("chargement_xp.R")
+
+library(ggplot2)
 ```
 
 ## Présentation du test 
 
+Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. Ils ont localisé 125 arbres. 
 
-Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 
+```{r}
+ggplot(data = xp_bota.shp, aes(x = participant)) +
+  geom_bar(fill = "forestgreen") + # penser à changer la couleur
+  labs(x ="Participants",
+       y ="Nombre de relevés") +
+  theme_bw() +
+  theme( 
+    panel.grid.major.x = element_blank() # ici c'est juste pour supprimer les lignes verticales
+  )
+```
 
+
+Il y a eu 5 activités de proposés : 
+
+* 1 : "Faites 5 relevés"
+* 2 : "Faites 3 relevés de genres différents" 
+* 3 : "Vérifiez 3 relevés d'un autre utilisateur (cercle vert clignotant)"
+* 4 : "Identifiez 3 relevés d'expert (cercle bleu clignotant)"
+* 5 : "Faites un maximum de relevé en un temps limite"
+
+Il était aussi possible de faire un relevé hors activité (6). 

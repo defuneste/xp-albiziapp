@@ -17,6 +17,7 @@ source("chargement_xp.R")
 
 #attention certaines fonctions sont masquées 
 library(tidyverse) # envt pour des donnees de type tidy pas trop volumineuse
+library(rgdal) # 
 library(tmap) # cartes statics
 library(tmaptools) # outils de carte dont palette_color
 library(leaflet) # cartes dynamiques
@@ -75,9 +76,17 @@ ggplot(aes(x = code_activ, fill = username)) +
 ## 5 - stats de base  ================
 
 summary(xp_bota.shp)
+dim(xp_bota.shp)
 
-ggplot(data = xp_bota.shp, aes(x = username)) +
-  geom_bar(aes(fill = code_activ))
+ggplot(data = xp_bota.shp, aes(x = participant)) +
+  geom_bar(fill = "forestgreen") + # penser à changer la couleur
+  labs(x ="Participants",
+       y ="Nombre de relevés") +
+  theme_bw() +
+  theme( 
+    panel.grid.major.x = element_blank() # ici c'est juste pour supprimer les lignes verticales
+  )
+
 
 ## 6 - nndist ================
 
