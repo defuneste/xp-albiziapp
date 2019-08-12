@@ -1,0 +1,18 @@
+---
+title: "EDA_XP"
+author: "defuneste"
+date: "12 août 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Présentation du test 
+
+
+Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 
+

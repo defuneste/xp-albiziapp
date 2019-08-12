@@ -72,8 +72,14 @@ ggplot(aes(x = code_activ, fill = username)) +
     labs(x ="Activités",
          y ="Nombre de relevés") 
 
+## 5 - stats de base  ================
 
-## 5 - nndist ================
+summary(xp_bota.shp)
+
+ggplot(data = xp_bota.shp, aes(x = username)) +
+  geom_bar(aes(fill = code_activ))
+
+## 6 - nndist ================
 
 newObservation_zone.df <- newObservation.df[zone.shp,]
 

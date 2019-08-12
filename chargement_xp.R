@@ -79,7 +79,7 @@ newObservation <- exp_brut[exp_brut$event == "newObservation",]
 
 newObservation.df <- newObservation[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
 
-## 2 - Formtage et ajout de données ================
+## 2 - Formatage et ajout de données ================
 # on met la bonne tz 
 attr(newObservation.df$date, "tzone") <- "Europe/Paris"
 
@@ -118,4 +118,10 @@ newObservation.df <- bind_cols(newObservation.df, df_bota) %>% select(-"authorNa
 #st_write(newObservation.df, "data/newObservation.geojson")
 
 # ici lecture du fichier après vérification de la bota dans qgis
-xp-bota.shp <- st_read("data/newObservation.geojson") 
+xp_bota.shp <- st_read("data/newObservation.geojson") 
+
+## 3 - Modification du fichier avec bota ================
+
+xp_bota.shp$code_activ <- as.factor(xp_bota.shp$code_activ)
+
+xp_bota.shp[is.na(xp_bota.shp$code_activ),]
