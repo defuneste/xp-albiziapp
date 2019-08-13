@@ -5,6 +5,7 @@ date: "12 août 2019"
 output: 
   html_document:
     toc: true
+    fig_caption: true
 ---
 
 ```{r setup, include=FALSE}
@@ -17,19 +18,7 @@ library(ggplot2)
 
 ## Présentation du test 
 
-Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. Ils ont localisé 125 arbres. 
-
-```{r}
-ggplot(data = xp_bota.shp, aes(x = participant)) +
-  geom_bar(fill = "forestgreen") + # penser à changer la couleur
-  labs(x ="Participants",
-       y ="Nombre de relevés") +
-  theme_bw() +
-  theme( 
-    panel.grid.major.x = element_blank() # ici c'est juste pour supprimer les lignes verticales
-  )
-```
-
+Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. Ils ont localisé 125 arbres (relevés). 
 
 Il y a eu 5 activités de proposés : 
 
@@ -40,3 +29,21 @@ Il y a eu 5 activités de proposés :
 * 5 : "Faites un maximum de relevé en un temps limite"
 
 Il était aussi possible de faire un relevé hors activité (6). 
+
+
+```{r, fig.align = 'center', echo = FALSE, fig.cap="test"}
+ggplot(data = xp_bota.shp, aes(x = participant)) +
+  geom_bar(aes(fill = code_activ)) + # penser à changer la couleur
+  labs(x ="Participants",
+       y ="Nombre de relevés",
+       title = "Nombre de reĺevés par participants en fonction des activités") +
+  scale_fill_discrete(name = "Activités") +
+  theme_bw() +
+  theme( 
+    panel.grid.major.x = element_blank() # ici c'est juste pour supprimer les lignes verticales
+  )
+```
+
+
+
+
