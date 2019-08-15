@@ -142,5 +142,3 @@ xp_bota.shp$code_activ <- as.factor(xp_bota.shp$code_activ)
 xp_bota.shp <- xp_bota.shp %>% 
   mutate(participant = fct_infreq(participant))
 
-
-

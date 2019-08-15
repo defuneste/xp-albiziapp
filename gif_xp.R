@@ -75,9 +75,6 @@ arbre_xp_zone.shp <- arbre_xp.shp[zone.shp,] # les arbres attendus
 # ici je prend chez stamen, il faut une bbox bb() de sf 
 xp_st_e <- ggmap(get_stamenmap(bb(zone.shp, output = "matrix"),zoom = 16, maptype = "terrain-lines"))
 
-xp_st_e +
-    
-
 
 # str(xp_st_e)
 # bb(x = xp_st_e$data$lon, y = xp_st_e$data$lat)

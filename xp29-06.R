@@ -65,7 +65,8 @@ strftime(newObservation.df$date, format="%H:%M:%S")
 
 ## 4 - Activité/personne ================
 
-table(newObservation.df$username, newObservation.df$code_activ)
+apply(table(newObservation.df$username, newObservation.df$code_activ), 1, sum)
+
 
 newObservation.df %>% 
 ggplot(aes(x = code_activ, fill = username)) +
@@ -126,7 +127,7 @@ newObservation_zone.df %>%
 
 ## 1 - Effet du point de départ  ================
 
-
+# on peut penser ici le modifier en commencant par une autre activité
 
 # tester différentes distance par rapport à lui
 

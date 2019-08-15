@@ -3,22 +3,42 @@ title: "EDA_XP"
 author: "defuneste"
 date: "12 août 2019"
 output: 
-  html_document:
-    toc: true
-    fig_caption: true
+  bookdown::html_document2:
+    toc: TRUE
+    fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 source("chargement_xp.R")
-
+## chargement des libraries
 library(ggplot2)
+library(bookdown)
+library(sf)
+library(ggmap)
+library(tmaptools)
+library(spatstat)
 ```
 
-## Présentation du test 
 
-Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. Ils ont localisé 125 arbres (relevés). 
+# Présentation du test 
+
+Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été éffectués entre les participants (figure \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
+
+## Zone de test
+
+La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot. Elle est delimité au nord par le campus Manu
+
+```{r zonetest, fig.align = 'center', echo=FALSE, message=FALSE, fig.cap="Carte de présentation de la zone de test"}
+load(file = "data/xp_st_e.RData")
+xp_st_e +
+  geom_sf(data = arbre_xp_zone.shp, inherit.aes = FALSE, pch = 16, alpha = 0.7, col = "forestgreen", size = 0.5) +
+  xlab("") + ylab("")
+```
+
+
+## Les 5 activités
 
 Il y a eu 5 activités de proposés : 
 
@@ -30,13 +50,13 @@ Il y a eu 5 activités de proposés :
 
 Il était aussi possible de faire un relevé hors activité (6). 
 
+Les activités 1 et 2 demandent un nombre precis de relevés pour être validés (respectivement 5 et 3). 
 
-```{r, fig.align = 'center', echo = FALSE, fig.cap="test"}
+```{r releveactivite, fig.align = 'center', echo = FALSE, fig.cap="Nombre de reĺevés par participants en fonction des activités"}
 ggplot(data = xp_bota.shp, aes(x = participant)) +
   geom_bar(aes(fill = code_activ)) + # penser à changer la couleur
   labs(x ="Participants",
-       y ="Nombre de relevés",
-       title = "Nombre de reĺevés par participants en fonction des activités") +
+       y ="Nombre de relevés") +
   scale_fill_discrete(name = "Activités") +
   theme_bw() +
   theme( 
