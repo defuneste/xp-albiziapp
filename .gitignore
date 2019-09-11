@@ -5,3 +5,4 @@
 *.Rproj
 # le fichier de jeux de données
 /data
+.html

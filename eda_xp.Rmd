@@ -24,18 +24,23 @@ library(spatstat)
 
 # Présentation du test 
 
-Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été éffectués entre les participants (figure \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
+Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été effectués entre les participants (figure \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
 
 ## Zone de test
 
-La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot. Elle est delimité au nord par le campus Manu
+La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monnet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. 
 
 ```{r zonetest, fig.align = 'center', echo=FALSE, message=FALSE, fig.cap="Carte de présentation de la zone de test"}
 load(file = "data/xp_st_e.RData")
 xp_st_e +
-  geom_sf(data = arbre_xp_zone.shp, inherit.aes = FALSE, pch = 16, alpha = 0.7, col = "forestgreen", size = 0.5) +
-  xlab("") + ylab("")
+  geom_sf(data = arbre_xp_zone.shp, inherit.aes = FALSE, pch = 16, alpha = 0.7, aes(col = "forestgreen"), size = 0.5, show.legend = "point") +
+  geom_point(aes(x = 4.3860717, y = 45.4496287), size = 4, pch = "M") +
+  xlab("") + ylab("") +
+  labs(caption = "Fonds OSM, rendu Stamen") +
+  scale_color_manual(values = c("forestgreen" = "forestgreen"), name = "", labels = "Arbres préalablement identifiés")
 ```
+
+Cette zone représente 
 
 
 ## Les 5 activités
@@ -50,7 +55,7 @@ Il y a eu 5 activités de proposés :
 
 Il était aussi possible de faire un relevé hors activité (6). 
 
-Les activités 1 et 2 demandent un nombre precis de relevés pour être validés (respectivement 5 et 3). 
+Les activités 1 et 2 demandent un nombre précis de relevés pour être validés (respectivement 5 et 3). 
 
 ```{r releveactivite, fig.align = 'center', echo = FALSE, fig.cap="Nombre de reĺevés par participants en fonction des activités"}
 ggplot(data = xp_bota.shp, aes(x = participant)) +
@@ -65,5 +70,5 @@ ggplot(data = xp_bota.shp, aes(x = participant)) +
 ```
 
 
-
+## Travail sur les données 
 

@@ -78,6 +78,7 @@ ggplot(aes(x = code_activ, fill = username)) +
 
 summary(xp_bota.shp)
 dim(xp_bota.shp)
+st_area(zone.shp)
 
 ggplot(data = xp_bota.shp, aes(x = participant)) +
   geom_bar(fill = "forestgreen") + # penser à changer la couleur

@@ -82,7 +82,7 @@ comptage_xp_reduit <- arbres_xp_reduit %>% # pour le sous ensemble
 
 
 
-On a un peu trop de genre pour que cela soit lisible sur un graph/carte en dessous de 10 individus species va devenir "autre". Je sais pas encore si je vais le garder. 
+# On a un peu trop de genre pour que cela soit lisible sur un graph/carte en dessous de 10 individus species va devenir "autre". Je sais pas encore si je vais le garder. 
 
 ```{r}
 comptage_xp %>% 
@@ -97,7 +97,7 @@ comptage_xp %>%
 
 
 
-On regarde la répartition des genres. On va attribuer une zone aux arbres ce qui est sans doute l'option la plus simple (et avec laquelle j'aurais du commencer)
+# On regarde la répartition des genres. On va attribuer une zone aux arbres ce qui est sans doute l'option la plus simple (et avec laquelle j'aurais du commencer)
 
 
 ```{r}
@@ -164,12 +164,11 @@ arbres_xp %>%
   xlab("distance (m)") +
   ylab("Nombres d'arbres")
 
-```
 
 
 #### La distance à un arbre de meme genre
 
-```{r}
+
 
 arbres_xp_dist <- arbres_xp
 arbres_xp_dist$ndistidem <- NA
@@ -195,9 +194,9 @@ for(i in 1:length(nom_genre)){
   print(nom_genre[i])} 
 
 # arbres_xp_dist <- dist_same_tree(nom_genre, arbres_xp_dist)
-```
 
-```{r}
+
+
 arbres_xp_dist %>% 
   filter(!is.na(ndistidem)) %>% 
   ggplot(aes(ndistidem, fill = genus)) + # il faut un facteur pour utiliser colours
@@ -206,4 +205,4 @@ arbres_xp_dist %>%
   facet_wrap(~genus, ncol = 2) +
   xlab("distance (m)") +
   ylab("Nombres d'arbres")
-```
+
