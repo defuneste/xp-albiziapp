@@ -1,6 +1,6 @@
 ---
 title: "EDA_XP"
-author: "defuneste"
+author: "Olivier Leroy"
 date: "12 août 2019"
 output: 
   bookdown::html_document2:
@@ -28,7 +28,9 @@ Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 parti
 
 ## Zone de test
 
-La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monnet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. 
+### Localisation et limite de la zone de test
+
+La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. Ce sont des axes simples à reconnaitre même pour quelqu'un de non familier de la zone. 
 
 ```{r zonetest, fig.align = 'center', echo=FALSE, message=FALSE, fig.cap="Carte de présentation de la zone de test"}
 load(file = "data/xp_st_e.RData")
@@ -40,7 +42,15 @@ xp_st_e +
   scale_color_manual(values = c("forestgreen" = "forestgreen"), name = "", labels = "Arbres préalablement identifiés")
 ```
 
-Cette zone représente 
+Cette zone est entièrement couverte par un wifi et dispose de prises de chargement de portables en accès libre. 
+
+### Arbres de la zone de test
+
+Cette zone représente `r round(st_area(zone.shp)/10000, 2)` h. Elle comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. 
+
+Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
+
+Les arbres sont en moyennes à 11,5 m les uns des autres, avec une médiane de 10,15 m et pour 90% des arbres cette distance est comprise entre 2,5 et 19,93 m. 
 
 
 ## Les 5 activités

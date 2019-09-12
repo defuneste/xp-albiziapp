@@ -45,7 +45,7 @@ carto_SE <- leaflet() %>%
                                    "Sp.:", newObservation.df$specie, "<br>",
                                    "Genre:", newObservation.df$genus),
                      color = ~pal(username)) %>% 
-addLegend(position = "bottomright",
+    addLegend(position = "bottomright",
           pal = pal,
           values = c("Catherine JHG", "JitenshaNiko", "Kasia Ozga", "MathDu", "pofx", "tjoliveau",  "Yoann Duriaux"),
           na.label = "abs d'info")
@@ -76,9 +76,29 @@ ggplot(aes(x = code_activ, fill = username)) +
 
 ## 5 - stats de base  ================
 
+### 5.1 Info sur la zone de test ================
+st_area(zone.shp) # surface de la zone
+nrow(arbre_xp_zone.shp) # nombre d'arbre 
+
+summary(arbre_xp_zone.shp)
+
+# un tableau du nombre d'arbre par genre
+comptage_xp_reduit <- arbre_xp_zone.shp %>% # pour le sous ensemble
+  st_set_geometry(value = NULL) %>% # on drop la geometrie
+  group_by(genus) %>%  # groupe par genus ou species
+  summarize(comptage = n()) %>% # on compte
+  arrange(desc(comptage)) # on range juste pour la lisibilité
+
+# combien d'espèce de prunus
+
+unique(arbre_xp_zone.shp$species[arbre_xp_zone.shp$genus == "Prunus" ])
+
+unique(arbre_xp_zone.shp$species)
+
+### 5.2 Info sur l'xp ================
 summary(xp_bota.shp)
 dim(xp_bota.shp)
-st_area(zone.shp)
+
 
 ggplot(data = xp_bota.shp, aes(x = participant)) +
   geom_bar(fill = "forestgreen") + # penser à changer la couleur
@@ -90,12 +110,13 @@ ggplot(data = xp_bota.shp, aes(x = participant)) +
   )
 
 
-## 6 - nndist ================
+## 6 - Distances entre les points ================
 
-newObservation_zone.df <- newObservation.df[zone.shp,]
+### 6.1 Distances à l'arbres le plus proches ====================
+
 
 ## ici on passe en sp avec sf
-xp_sp <- as(st_transform(newObservation_zone.df, 2154), "Spatial")
+xp_sp <- as(st_transform(arbre_xp_zone.shp , 2154), "Spatial")
 ## ici on passe en ppp avec maptools
 xp_ppp <- as.ppp(xp_sp) 
 
@@ -110,17 +131,36 @@ plot(xp_ppp$x, xp_ppp$y)
 arbre_plus_proche <- nndist(xp_ppp)
 class(arbre_plus_proche)
 length(arbre_plus_proche)
+# une serie de stats de verif
 head(arbre_plus_proche)
+mean(arbre_plus_proche)
+summary(arbre_plus_proche)
+PI(arbre_plus_proche) # necessite rethinking 
 
 ## on sauve comme une nouvelle variable
-newObservation_zone.df$dist <- nndist(xp_ppp)
+arbre_xp_zone.shp$dist <- nndist(xp_ppp)
 
 # un graph
 newObservation_zone.df %>% 
     ggplot(aes(dist)) + # il faut un facteur pour utiliser colours
-    geom_freqpoly(binwidth = 1) + 
+    geom_freqpoly(binwidth = 5) + 
     xlab("distance (m)") +
     ylab("Nombres d'arbres")
+
+### 6.2 Distances à l'arbres d'un genre différent le plus proches ====================
+
+# retourne un tableau avec la distance aà tous les genre
+
+data(ants)
+plot(ants)
+nnda <- nndist(ants, by=marks(ants)) 
+head(nnda)
+
+# ici retourne un tableau de l'arbre le plus proche par genre 
+# droplevel a été utilisé pour virer les levels non utilisés je devrais le faire avant
+# des genre contenu dans marks 
+arbre_plus_proche_genre <- nndist(xp_ppp, by=droplevels(marks(xp_ppp)$genus))
+
 
 # . -------------------------------------------------------------------------- =============
 # III - Différents effets de l'envt possible  ----------------------------------------------------------------- =============

@@ -66,25 +66,9 @@ carto_se
 
 ## des stats
 
-
-comptage_xp <-  arbres_xp %>% # pour l'ensemble
-  st_set_geometry(value = NULL) %>% # on drop la geometrie
-  group_by(genus) %>% # groupe par genus ou species
-  summarize(comptage = n()) %>% # on compte
-  arrange(desc(comptage)) # on range juste pour la lisibilité
-
-comptage_xp_reduit <- arbres_xp_reduit %>% # pour le sous ensemble
-  st_set_geometry(value = NULL) %>% # on drop la geometrie
-  group_by(genus) %>%  # groupe par genus ou species
-  summarize(comptage = n()) %>% # on compte
-  arrange(desc(comptage)) # on range juste pour la lisibilité
-
-
-
-
 # On a un peu trop de genre pour que cela soit lisible sur un graph/carte en dessous de 10 individus species va devenir "autre". Je sais pas encore si je vais le garder. 
 
-```{r}
+
 comptage_xp %>% 
   # ici on reprend le fichier de comptage et on va attraibuer Autres si on est inf à 10
   # puis on regroupe et recompte
@@ -93,14 +77,10 @@ comptage_xp %>%
   summarize(comptage = sum(comptage)) %>% 
   arrange(desc(comptage))
 
-```
-
-
-
 # On regarde la répartition des genres. On va attribuer une zone aux arbres ce qui est sans doute l'option la plus simple (et avec laquelle j'aurais du commencer)
 
 
-```{r}
+
 arbres_xp <- st_join(arbres_xp, zone.shp) # une jointure spatiale, ici on prend tous le fichier comme il est presque vide
 table(arbres_xp$id) # une verif
 
@@ -112,11 +92,8 @@ temp_order <- arbres_xp %>%
 
 # on le reinjecte dans arbres_xp pour ordonner le futur graph par le nombre d'occurence
 arbres_xp <- left_join (arbres_xp, temp_order, by =c ("genus" = "genus" ))
-```
 
 
-
-```{r}
 arbres_xp %>% 
   st_set_geometry(value = NULL) %>% # on drop la geométrie
   ggplot(aes(x= reorder(genus, n))) + #  fill = as.factor(id))) + # ici on reoder avec n et on met id n factor pour le remplissage
@@ -128,12 +105,8 @@ arbres_xp %>%
   #                                 name = "Zonage", labels = c("Elargi", "Reduit")) + # la legende
   theme(axis.text=element_text(size=8)) # on diminue la taille des labels
 
-
-```
-
 ## des stats de distance et NN
 
-```{r}
 ## ici on passe en sp avec sf
 xp_sp <- as(st_transform(arbres_xp, 2154), "Spatial")
 ## ici on passe en ppp avec maptools
@@ -188,7 +161,6 @@ dist_same_tree <- function(nom_genre, arbres_sf) {
 nom_genre <- c("Platanus", "Prunus", "Acer", "Pinus", "Tilia", "Sorbus", "Quercus", "Cedrus", "Alnus", "Populus") 
 
 
-
 for(i in 1:length(nom_genre)){
   arbres_xp_dist <- dist_same_tree(nom_genre[i], arbres_xp_dist)
   print(nom_genre[i])} 
@@ -198,7 +170,7 @@ for(i in 1:length(nom_genre)){
 
 
 arbres_xp_dist %>% 
-  filter(!is.na(ndistidem)) %>% 
+  filter(!is.na(ndistidem)) %>% # ici c'est un filtre des NA cf ligne plus
   ggplot(aes(ndistidem, fill = genus)) + # il faut un facteur pour utiliser colours
   geom_histogram(binwidth = 1) + # freqpoly avec un binwidth de 1 m 
   scale_x_continuous(limits = c(0,30)) +
