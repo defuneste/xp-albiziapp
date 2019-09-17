@@ -140,5 +140,22 @@ xp_bota.shp$code_activ[is.na(xp_bota.shp$code_activ)] <- 6
 xp_bota.shp$code_activ <- as.factor(xp_bota.shp$code_activ)
 
 xp_bota.shp <- xp_bota.shp %>% 
-  mutate(participant = fct_infreq(participant))
+  mutate(Participant = fct_infreq(participant)) %>% # on passe en fct et on rajoute une maj 
+  select(-participant) # on supprime l'ancien
+
+# recodage de bota en plusieurs valeurs
+
+# un 0 faux / 1 oui pour nom commun et NA si pas d'info (mettre 0 ?)
+xp_bota.shp$bota_commun[!is.na(xp_bota.shp$common) & xp_bota.shp$bota == 0] <- 0
+xp_bota.shp$bota_commun[!is.na(xp_bota.shp$common) & xp_bota.shp$bota == 3 | xp_bota.shp$bota == 5 | xp_bota.shp$bota == 2] <- 1
+
+# un 0 faux / 1 oui pour genre et NA si pas d'info (mettre 0 ?)
+xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus) & xp_bota.shp$bota == 0] <- 0
+xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus) & xp_bota.shp$bota >= 1 & xp_bota.shp$bota < 5] <- 1
+
+xp_bota.shp$bota_genus
+
+# un 0 faux / 1 oui pour espece et NA si pas d'info (mettre 0 ?)
+xp_bota.shp$bota_especie[!is.na(xp_bota.shp$especie) & xp_bota.shp$bota == 0] <- 0
+#xp_bota.shp$bota_especie[!is.na(xp_bota.shp$especie) & xp_bota.shp$bota >= 1 & xp_bota.shp$bota < 5] <- 1
 

@@ -98,22 +98,27 @@ unique(arbre_xp_zone.shp$species)
 ### 5.2 Info sur l'xp ================
 summary(xp_bota.shp)
 dim(xp_bota.shp)
+names(xp_bota.shp)
 
+# un tableau du nombre de relvé par participants
 
-ggplot(data = xp_bota.shp, aes(x = participant)) +
-  geom_bar(fill = "forestgreen") + # penser à changer la couleur
-  labs(x ="Participants",
-       y ="Nombre de relevés") +
-  theme_bw() +
-  theme( 
-    panel.grid.major.x = element_blank() # ici c'est juste pour supprimer les lignes verticales
-  )
+tableau_participants <- as.data.frame(table(xp_bota.shp$participant))
 
+xp_bota.shp %>%  
+  st_set_geometry(value = NULL) %>%  # on drop la geométrie
+  group_by(Participant) %>% # on groupe par participants
+  summarise(nb_releve = n(), # nombre de nouvelles observations par participants
+            nb_genre = sum(!is.na(common)), # nombre de nom commun renseignés 
+            nb_commun = sum(!is.na(genus)), # nombre de genre renseignés
+            nb_espece = sum(!is.na(specie)) # nombre d'especes latin renseigné
+            )  
+
+# nombre de relevé avec au moins une info. Attention utilise NA dans bota pour cela
+sum(!is.na(xp_bota.shp$bota))
 
 ## 6 - Distances entre les points ================
 
 ### 6.1 Distances à l'arbres le plus proches ====================
-
 
 ## ici on passe en sp avec sf
 xp_sp <- as(st_transform(arbre_xp_zone.shp , 2154), "Spatial")
@@ -135,15 +140,16 @@ length(arbre_plus_proche)
 head(arbre_plus_proche)
 mean(arbre_plus_proche)
 summary(arbre_plus_proche)
+library(rethinking)
 PI(arbre_plus_proche) # necessite rethinking 
 
 ## on sauve comme une nouvelle variable
 arbre_xp_zone.shp$dist <- nndist(xp_ppp)
 
 # un graph
-newObservation_zone.df %>% 
+arbre_xp_zone.shp %>% 
     ggplot(aes(dist)) + # il faut un facteur pour utiliser colours
-    geom_freqpoly(binwidth = 5) + 
+    geom_freqpoly(binwidth = 1) + 
     xlab("distance (m)") +
     ylab("Nombres d'arbres")
 
@@ -161,6 +167,7 @@ head(nnda)
 # des genre contenu dans marks 
 arbre_plus_proche_genre <- nndist(xp_ppp, by=droplevels(marks(xp_ppp)$genus))
 
+apply(arbre_plus_proche_genre, 1, min)
 
 # . -------------------------------------------------------------------------- =============
 # III - Différents effets de l'envt possible  ----------------------------------------------------------------- =============
