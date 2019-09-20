@@ -100,14 +100,15 @@ Les platanes ont aussi été validés comme "bon" largement : "Platane hybride",
 * 3 : genre / non commun / espèce de présents et bon (si j'avais le nom latin j’estimais que c’était bon)
 * 4 : genre bon mais reste mauvais
 * 5 : "Nom commun de bon"  
+* 6 : genre et non latin de bon
 
 J'avais fait une seule variable car j'avais l'impression de forte corrélation, mais au final c'est plus simple de faire plusieurs variables (tout en gardant en tête une  éventuelle corrélation).
 
 Pour simplifier un recodage par info à été fait : 
 
-* `bota_commun` : 0 = faux et 1 bon (`bota` = 2, 3 ou 5) et NA si pas d'info (ne devrait-on pas mettre 0 ?)
-* `bota_genre` : 0 = faux et 1 bon (`bota` = 2, 3 ou 5) et NA si pas d'info
-* `bota_especie` : 
+* `bota_commun` : 0  = faux (`bota` = 0, 1, 4, 6) et 1 bon (`bota` = 2, 3 ou 5) et NA si pas d'info (ne devrait-on pas mettre 0 ?)
+* `bota_genre` : 0 = faux et (`bota` = 0, 5) 1 bon (`bota` = 1, 2, 3, 4 et 6) et NA si pas d'info
+* `bota_especie` :  0 = faux et 1 bon (`bota` = 3) et NA si pas d'info
 
 `Ajout` : correspond à un arbre non présent dans la base, que les participants ont trouvé et qui existe bien. Attention, il est aussi possible que cela soit des arbustes qui sont problématiques dans la définition d'un arbre.  
 

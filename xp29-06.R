@@ -110,8 +110,8 @@ xp_bota.shp %>%
   summarise(nb_releve = n(), # nombre de nouvelles observations par participants
             nb_genre = sum(!is.na(common)), # nombre de nom commun renseignés 
             nb_commun = sum(!is.na(genus)), # nombre de genre renseignés
-            nb_espece = sum(!is.na(specie)) # nombre d'especes latin renseigné
-            )  
+            nb_espece = sum(!is.na(specie)), # nombre d'especes latin renseigné
+            ok_commun = sum(nb_commun))  
 
 # nombre de relevé avec au moins une info. Attention utilise NA dans bota pour cela
 sum(!is.na(xp_bota.shp$bota))
