@@ -46,7 +46,7 @@ L'endroit est entièrement couverte par un wifi et dispose de prises de chargeme
 
 ### Arbres de la zone de test
 
-Cette zone représente `r round(st_area(zone.shp)/10000, 2)` h. Elle comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. 
+Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. 
 
 Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
 

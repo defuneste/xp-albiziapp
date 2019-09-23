@@ -260,11 +260,16 @@ Figure 1.2: Nombre de reĺevés par participants en fonction des activités
 <li>2 : genre et non commun présents et bons</li>
 <li>3 : genre / non commun / espèce de présents et bon (si j’avais le nom latin j’estimais que c’était bon)</li>
 <li>4 : genre bon mais reste mauvais</li>
-<li>5 : “Nom commun de bon”</li>
+<li>5 : “Nom commun de bon”<br />
+</li>
+<li>6 : genre et non latin de bon</li>
 </ul>
+<p>J’avais fait une seule variable car j’avais l’impression de forte corrélation, mais au final c’est plus simple de faire plusieurs variables (tout en gardant en tête une éventuelle corrélation).</p>
 <p>Pour simplifier un recodage par info à été fait :</p>
 <ul>
-<li><code>bota_commun</code> : 0 = faux et 1 bon (<code>bota</code> = 2, 3 ou 5) et NA si pas d’info (ne devrait-on pas mettre 0 ?)</li>
+<li><code>bota_commun</code> : 0 = faux (<code>bota</code> = 0, 1, 4, 6) et 1 bon (<code>bota</code> = 2, 3 ou 5) et NA si pas d’info (ne devrait-on pas mettre 0 ?)</li>
+<li><code>bota_genre</code> : 0 = faux et (<code>bota</code> = 0, 5) 1 bon (<code>bota</code> = 1, 2, 3, 4 et 6) et NA si pas d’info</li>
+<li><code>bota_especie</code> : 0 = faux et 1 bon (<code>bota</code> = 3) et NA si pas d’info</li>
 </ul>
 <p><code>Ajout</code> : correspond à un arbre non présent dans la base, que les participants ont trouvé et qui existe bien. Attention, il est aussi possible que cela soit des arbustes qui sont problématiques dans la définition d’un arbre.</p>
 </div>
