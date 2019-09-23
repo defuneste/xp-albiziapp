@@ -160,7 +160,7 @@ arbre_xp_zone.shp %>%
 
 ## ici on passe en sp avec sf, on le fait pour xp_bota
 ## penser à en faire une fonction
-xp_sp <- as(st_transform(xp_bota.shp , 2154), "Spatial")
+xp_sp <- as(st_transform(xp_bota.shp[zone.shp,] , 2154), "Spatial")
 ## ici on passe en ppp avec maptools
 xp_ppp <- as.ppp(xp_sp) 
 

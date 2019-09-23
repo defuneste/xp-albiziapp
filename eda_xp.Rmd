@@ -5,6 +5,7 @@ date: "12 août 2019"
 output: 
   bookdown::html_document2:
     toc: TRUE
+    toc_float: TRUE
     fig_caption: yes
 ---
 
@@ -118,7 +119,7 @@ Pour simplifier un recodage par info à été fait :
 
 ## Synthèse rapide
 
-Le tableau \@ref(tab:test) bbqbq
+Le tableau \@ref(tab:test) indique pour chaque participant le nombre de relevés effectués (`nb_releve`), le nombre de relevés avec le nom commun, le genre et l'espèce de renseignés (`nb_commun`, `nb_genre` et `nb_espece`) et le nombre de ces relevés qui sont bon pour chaque catégorie botanique (ex : `genre_bon` pour le nombre de relevés ou le genre est bon). 
 
 
 ```{r, test, fig.align = 'center', echo = FALSE}
@@ -138,3 +139,7 @@ kable(tableau_participants, caption = 'Informations botaniques par participants'
 ```
 
 
+## Distances 
+
+
+La distance moyenne entre deux relevés d'arbres les plus proches est de 11,48 m et sa médiane est de 10,16. 90% de ces distances sont comprises entres 2,52 et 19,93 m. 
