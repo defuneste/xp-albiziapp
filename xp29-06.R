@@ -156,6 +156,42 @@ arbre_xp_zone.shp %>%
     xlab("distance (m)") +
     ylab("Nombres d'arbres")
 
+
+
+## ici on passe en sp avec sf, on le fait pour xp_bota
+## penser à en faire une fonction
+xp_sp <- as(st_transform(xp_bota.shp , 2154), "Spatial")
+## ici on passe en ppp avec maptools
+xp_ppp <- as.ppp(xp_sp) 
+
+## on verifie 
+class(xp_ppp)
+str(xp_ppp)
+
+## on plot
+plot(xp_ppp$x, xp_ppp$y)
+# ici juste dans un veteur
+# nndist vient de spatstat 
+arbre_plus_proche <- nndist(xp_ppp)
+class(arbre_plus_proche)
+length(arbre_plus_proche)
+# une serie de stats de verif
+head(arbre_plus_proche)
+mean(arbre_plus_proche)
+summary(arbre_plus_proche)
+library(rethinking)
+PI(arbre_plus_proche) # necessite rethinking 
+
+## on sauve comme une nouvelle variable
+arbre_xp_zone.shp$dist <- nndist(xp_ppp)
+
+# un graph
+arbre_xp_zone.shp %>% 
+  ggplot(aes(dist)) + # il faut un facteur pour utiliser colours
+  geom_freqpoly(binwidth = 1) + 
+  xlab("distance (m)") +
+  ylab("Nombres d'arbres")
+
 ### 6.2 Distances à l'arbres d'un genre différent le plus proches ====================
 
 # retourne un tableau avec la distance aà tous les genre

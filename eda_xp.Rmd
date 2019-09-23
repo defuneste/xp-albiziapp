@@ -24,7 +24,7 @@ library(spatstat)
 
 # Présentation du test 
 
-Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été effectués entre les participants (figure \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
+Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été effectués entre les participants (figure : \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
 
 ## Zone de test
 
@@ -67,7 +67,7 @@ Il était aussi possible de faire un relevé hors activité (6).
 
 Les activités 1 et 2 demandent un nombre précis de relevés pour être validés (respectivement 5 et 3). 
 
-```{r releveactivite, fig.align = 'center', echo = FALSE, fig.cap="Nombre de reĺevés par participants en fonction des activités"}
+```{r, releveactivite, fig.align = 'center', echo = FALSE, fig.cap="Nombre de reĺevés par participants en fonction des activités"}
 ggplot(data = xp_bota.shp, aes(x = Participant)) +
   geom_bar(aes(fill = code_activ)) + # penser à changer la couleur
   labs(x ="Participants",
@@ -116,18 +116,25 @@ Pour simplifier un recodage par info à été fait :
 
 # Premiers résultats 
 
-```{r, fig.align = 'center', echo = FALSE, fig.cap="Tableau de présentation "}
-tableau_participants <- xp_bota.shp %>%  
+## Synthèse rapide
+
+Le tableau \@ref(tab:test) bbqbq
+
+
+```{r, test, fig.align = 'center', echo = FALSE}
+tableau_participants <- xp_bota.shp %>% 
   st_set_geometry(value = NULL) %>%  # on drop la geométrie
   group_by(Participant) %>% # on groupe par participants
   summarise(nb_releve = n(), # nombre de nouvelles observations par participants
-            nb_genre = sum(!is.na(common)), # nombre de nom commun renseignés 
-            nb_commun = sum(!is.na(genus)), # nombre de genre renseignés
-            nb_espece = sum(!is.na(specie)) # nombre d'especes latin renseigné
+            nb_commun = sum(!is.na(common)), # nombre de nom commun renseignés 
+            commun_bon = sum(bota_commun, na.rm = T), #nombre de non commun bon
+            nb_genre = sum(!is.na(genus)), # nombre de genre renseignés
+            genre_bon = sum(bota_genus, na.rm = T), # nombre de genre bon
+            nb_espece = sum(!is.na(specie)), # nombre d'especes latin renseigné
+            espece_bon = sum(bota_specie, na.rm = T) # nombre d'espèce de bon
             ) 
 library(knitr)
-kable(tableau_participants)
+kable(tableau_participants, caption = 'Informations botaniques par participants', align = c( "c","c","c","c","c", "c","c","c"))
 ```
-
 
 
