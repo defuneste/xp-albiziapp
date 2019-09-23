@@ -116,6 +116,9 @@ xp_bota.shp %>%
 # nombre de relevé avec au moins une info. Attention utilise NA dans bota pour cela
 sum(!is.na(xp_bota.shp$bota))
 
+# nombre de relevé vérifiés
+sum(!is.na(xp_bota.shp$verif))
+
 ## 6 - Distances entre les points ================
 
 ### 6.1 Distances à l'arbres le plus proches ====================

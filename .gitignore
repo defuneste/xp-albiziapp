@@ -5,4 +5,6 @@
 *.Rproj
 # le fichier de jeux de données
 /data
-.html
+# le fichier des data viz
+/visualisation
+*.html

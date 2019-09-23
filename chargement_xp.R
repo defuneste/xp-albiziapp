@@ -145,16 +145,15 @@ xp_bota.shp <- xp_bota.shp %>%
 
 # recodage de bota en plusieurs valeurs
 
-# un 0 faux / 1 oui pour nom commun et NA si pas d'info (mettre 0 ?)
-xp_bota.shp$bota_commun[!is.na(xp_bota.shp$common) ] <- 0
+# nom commun : un 0 faux / 1 oui et NA si pas d'info (mettre 0 ?)
+xp_bota.shp$bota_commun[!is.na(xp_bota.shp$common)] <- 0
 xp_bota.shp$bota_commun[!is.na(xp_bota.shp$common) & xp_bota.shp$bota == 2 | xp_bota.shp$bota == 3 | xp_bota.shp$bota == 5] <- 1
 
-# un 0 faux / 1 oui pour genre et NA si pas d'info (mettre 0 ?)
-xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus) & xp_bota.shp$bota == 0] <- 0
-xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus) & xp_bota.shp$bota >= 1 & xp_bota.shp$bota < 5] <- 1
-
-# un 0 faux / 1 oui pour espece et NA si pas d'info (mettre 0 ?)
-xp_bota.shp$bota_specie[!is.na(xp_bota.shp$specie) & xp_bota.shp$bota == 0] <- 0
+# genre :  un 0 faux / 1 oui et NA si pas d'info (mettre 0 ?)
+xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus)] <- 0
+xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus) & xp_bota.shp$bota == 1 | xp_bota.shp$bota == 2 | xp_bota.shp$bota == 3 
+                       | xp_bota.shp$bota == 4 | xp_bota.shp$bota == 6] <- 1
+ 
+# espece : un 0 faux / 1 oui  et NA si pas d'info (mettre 0 ?)
+xp_bota.shp$bota_specie[!is.na(xp_bota.shp$specie)] <- 0
 xp_bota.shp$bota_specie[!is.na(xp_bota.shp$specie) & xp_bota.shp$bota == 3] <- 1
-
-xp_bota.shp$bota_common

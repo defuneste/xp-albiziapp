@@ -88,18 +88,20 @@ Pour le moment aucun travail sur l'emplacement exacte des arbres n'a pas été m
 
 ### Validation genre et espèce
 
-La vérification des genres et espèces c'est fait dans un premier temps à l'aide d'un SIG "bureau" en comparant le relevé de l'utilisateur à ce que nous connaissions via la base de données. Dans le cas de doute, relevé loin d'un arbre pouvant correspondre, erreur peu probable (espèce vraiment différente) nous sommes allés directement sur le terrain pour vérifier. Cela correspondait à `r sum(!is.na(xp_bota.shp$verif))` cas (une mâtinée de travail). Dans ces cas la photo fût aussi utiliser et fût d'une aide précieuse.
+La vérification des genres et espèces c'est fait dans un premier temps à l'aide d'un SIG "bureau" en comparant le relevé de l'utilisateur à ce que nous connaissions via la base de données. C'est difficile de l'automatiser car l'arbre le plus proche n'est pas obligatoirement celui relevé. Dans le cas de doute, relevé loin d'un arbre pouvant correspondre ou une erreur peu probable (espèce vraiment différente) nous sommes allés directement sur le terrain pour vérifier.
 
-Les platanes ont aussi été validés comme "bon" largement : "Platane hybride", "Platane occidentale" etc.. sont considérés valides (c'est peu être trop laxiste).
+Cela correspondait à `r sum(!is.na(xp_bota.shp$verif))` pour `r sum(!is.na(xp_bota.shp$bota))` relevés avec une info botanique (genre, espèce, nom commun). Cela représenta une mâtinée de travail. Dans ces cas la photo fût aussi utilisée et fût d'une aide précieuse.
+
+Après reflexion, j'ai décidé de mettre faux au nom d'espèce des platanes. 
 
 `bota` est le champs correspondant à l'exactitude de l'information botanique. Il peut prendre les valeurs de :
 
 * 0 : une erreur d'identification
 * 1 : le genre est présent et bon
-* 2 : genre et non commun présents et bons
-* 3 : genre / non commun / espèce de présents et bon (si j'avais le nom latin j’estimais que c’était bon)
-* 4 : genre bon mais reste mauvais
-* 5 : "Nom commun de bon"  
+* 2 : genre et nom commun présents et bons
+* 3 : genre / non commun / espèce de présents
+* 4 : genre bon mais reste mauvais (redondant avec 1, la différence est que 1 ne devait qu'avoir le genre)
+* 5 : Nom commun de bon  
 * 6 : genre et non latin de bon
 
 J'avais fait une seule variable car j'avais l'impression de forte corrélation, mais au final c'est plus simple de faire plusieurs variables (tout en gardant en tête une  éventuelle corrélation).
