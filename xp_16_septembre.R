@@ -35,7 +35,7 @@ for(i in 1:length(newObservation$event)) {
   newObservation.shp$point[i] <- st_sfc(st_point(newObservation$object[[i]]$location$coordinates))}
 
 newObservation.shp <- st_sf(newObservation.shp, geom = newObservation.shp$point) # la bonne colone pour le champs geom
-newObservation.shp <- newObservation.df[,-4] ## attention ici j'ai fait des selections par num de colonnes
+newObservation.shp <- newObservation.shp[,-4] ## attention ici j'ai fait des selections par num de colonnes
 
 st_crs(newObservation.shp) = 4326 # le bon scr
 
@@ -75,6 +75,12 @@ arbre_xp_zone.shp <- arbre_xp.shp[zone.shp,]
 
 newObservation.shp <- newObservation.shp[zone.shp,]
 
+newObservation.shp <- bind_cols(newObservation.df, df_bota) %>% select(-"authorName")
+
+# on sauve 
+#st_write(newObservation.shp, "data/xp_16_09_2019.geojson")
+
+
 
 # . -------------------------------------------------------------------------- =============
 # II - une carte animée ----------------------------------------------------------------- =============
@@ -82,7 +88,7 @@ newObservation.shp <- newObservation.shp[zone.shp,]
 
 ## 1 - Fond de cartes  =======
 # ici je prend chez stamen, il faut une bbox bb() de sf 
-# xp_st_e <- ggmap(get_stamenmap(bb(zone.shp, output = "matrix"),zoom = 16, maptype = "terrain-lines"))
+xp_st_e <- ggmap(get_stamenmap(bb(zone.shp, output = "matrix"),zoom = 16, maptype = "terrain-lines"))
 
 
 # str(xp_st_e)
@@ -108,6 +114,9 @@ obs_timing$username <- newObservation.shp$username
 
 unique(obs_timing$username)
 
+# animation::ani.options(ani.width= 1000, ani.height=1000, ani.res = 1000)
+# animation::ani.options()
+
 xp_st_e_anim <- xp_st_e + 
   geom_point(aes(x = 4.3860717, y = 45.4496287), size = 4, pch = "M") +# localisation mixeur
   geom_point(data = arbre_xp_zone.coord, aes(x = X, y = Y), size = 0.75, col = "#208842", alpha = 0.5) +
@@ -119,8 +128,15 @@ xp_st_e_anim <- xp_st_e +
   transition_components(date) +
   shadow_mark() 
 
-xp_st_e_anim
+animate(xp_st_e_anim , height = 800, width =800)
 
-anim_save("xp_st_e_16-09.gif" , animation = last_animation())
+anim_save("xp_st_e_16-09bigger.gif" , animation = last_animation())
 
 unique(newObservation.shp$username)
+
+
+#### verif rapide 
+
+xp_16_09_bota.shp <- st_read("data/xp_16_09_2019.geojson")
+summary(xp_16_09_bota.shp)
+

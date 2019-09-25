@@ -4,6 +4,7 @@ author: "Olivier Leroy"
 date: "12 août 2019"
 output: 
   bookdown::html_document2:
+    theme: readable
     toc: TRUE
     toc_float: TRUE
     fig_caption: yes
@@ -142,4 +143,4 @@ kable(tableau_participants, caption = 'Informations botaniques par participants'
 ## Distances 
 
 
-La distance moyenne entre deux relevés d'arbres les plus proches est de 11,48 m et sa médiane est de 10,16. 90% de ces distances sont comprises entres 2,52 et 19,93 m. 
+La distance moyenne entre deux relevés d'arbres les plus proches est de 11,48 m et sa médiane est de 10,16. 90% de ces distances sont comprises entres 2,52 et 19,93 m.
