@@ -17,4 +17,4 @@ xp_bot.df <- subset(xp_bot.df,select = -geometry) # xls aime pas le champ gÃ©omÃ
 list_xp_bot.df <- split(xp_bot.df, xp_bot.df$username) # verifier que username est un facteur
 
 
-write.xlsx(file = "xp_29_96.xlsx", list_xp_bot.df)
+write.xlsx(file = "xp_29_96v2.xlsx", list_xp_bot.df)

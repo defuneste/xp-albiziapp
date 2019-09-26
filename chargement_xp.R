@@ -183,3 +183,5 @@ xp_bota.shp$hasImage <-f_unlist(newObservation[["object"]], "hasImage")
 
 xp_bota.shp <- xp_bota.shp[zone.shp,]
 
+# réorganiser les colonne, un extract
+xp_bota.shp <- xp_bota.shp[,c(15,1,10,2,3,4,5,6,12,13,14,7,8,9,16,17,11)]
