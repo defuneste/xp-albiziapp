@@ -42,7 +42,7 @@ st_crs(newObservation.shp) = 4326 # le bon scr
 df_bota <- as.data.frame(t(sapply(newObservation[["object"]], `[`, c("authorName", "common" , "specie", "genus"))))
 names(df_bota) <- c("authorName", "common", "specie", "genus")
 
-# on a un pb avec le sapply on genere des listes il faut le corriger
+# on a un pb avec le sapply on genere des listes il faut le corriger, pe le fonctionnaliser
 df_bota$common[df_bota[["common"]] == "NULL"] <- NA
 df_bota$specie[df_bota[["specie"]] == "NULL"] <- NA
 df_bota$genus[df_bota[["genus"]] == "NULL"] <- NA

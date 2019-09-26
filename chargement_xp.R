@@ -157,3 +157,29 @@ xp_bota.shp$bota_genus[!is.na(xp_bota.shp$genus) & xp_bota.shp$bota == 1 | xp_bo
 # espece : un 0 faux / 1 oui  et NA si pas d'info (mettre 0 ?)
 xp_bota.shp$bota_specie[!is.na(xp_bota.shp$specie)] <- 0
 xp_bota.shp$bota_specie[!is.na(xp_bota.shp$specie) & xp_bota.shp$bota == 3] <- 1
+
+# on rajoute l'id de mongodb
+xp_bota.shp$id <- unlist(newObservation[1])
+
+# on rajoute la confiance 
+xp_bota.shp$confiance <- unlist( # on déroule la liste 
+                            sapply(newObservation[["object"]], # sapply sur la colonne qui contient les variables d'intéret
+                                   `[`,  # `[` est la foction d'indexation
+                                   "confidence")) # on indexe sur une variable de nom confidence
+
+# on va fonctionnaliser pour gagner du temps, la fonction fait la meme chose que pour le cas de la confiance 
+# elle prend une list d'un niveau et 
+
+f_unlist <- function(une_list_un_niveau, un_nom_de_champ) {
+    unlist( # on déroule la liste 
+        sapply(une_list_un_niveau, # sapply sur la colonne qui contient les variables d'intéret
+              `[`,  # `[` est la foction d'indexation
+              un_nom_de_champ)) # on indexe sur une variable de nom confidence}
+}
+
+xp_bota.shp$hasImage <-f_unlist(newObservation[["object"]], "hasImage")
+
+# je découpe avec la zone 
+
+xp_bota.shp <- xp_bota.shp[zone.shp,]
+
