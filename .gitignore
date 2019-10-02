@@ -3,6 +3,8 @@
 .RData
 .Ruserdata
 *.Rproj
+*.xls
+*.gif
 # le fichier de jeux de données
 /data
 # le fichier des data viz
