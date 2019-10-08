@@ -14,6 +14,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 
 source("chargement_xp.R")
+source("chargement_xp_16_09.R")
+
 ## chargement des libraries
 library(ggplot2)
 library(bookdown)
@@ -26,7 +28,11 @@ library(spatstat)
 
 # Présentation du test 
 
-Le test a eu lieu le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été effectués entre les participants (figure : \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
+L'application a été testée trois fois :
+
+* Le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été comptés entre les participants (figure : \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
+* Le lundi 16 septembre de 15h40 à 17h00 et regroupait `r length(unique(xp_16_09_bota.shp$username))` participants. `r nrow(xp_16_09_bota.shp)` arbres ont été comptés. 
+* Le mardi 1 octobre de XX à XX .....
 
 ## Zone de test
 
@@ -85,16 +91,20 @@ ggplot(data = xp_bota.shp, aes(x = Participant)) +
 ## Travail sur les données 
 
 ### Travail non effectué 
-Pour le moment aucun travail sur l'emplacement exacte des arbres n'a pas été mené. 
 
+Pour le moment aucun travail sur l'emplacement exacte des arbres n'a pas été mené. 
 
 ### Validation genre et espèce
 
+#### Méthode de validation
+
 La vérification des genres et espèces c'est fait dans un premier temps à l'aide d'un SIG "bureau" en comparant le relevé de l'utilisateur à ce que nous connaissions via la base de données. C'est difficile de l'automatiser car l'arbre le plus proche n'est pas obligatoirement celui relevé. Dans le cas de doute, relevé loin d'un arbre pouvant correspondre ou une erreur peu probable (espèce vraiment différente) nous sommes allés directement sur le terrain pour vérifier.
 
-Cela correspondait à `r sum(!is.na(xp_bota.shp$verif))` pour `r sum(!is.na(xp_bota.shp$bota))` relevés avec une info botanique (genre, espèce, nom commun). Cela représenta une mâtinée de travail. Dans ces cas la photo fût aussi utilisée et fût d'une aide précieuse.
+Pour la première expérience cela correspondait à `r sum(!is.na(xp_bota.shp$verif))` pour `r sum(!is.na(xp_bota.shp$bota))` relevés avec une information botanique (genre, espèce, nom commun) et représentait une mâtinée de travail sur le terrain. La seconde expérience comportait proportionnellement plus d'informations botaniques (seulement 3 relevés n'en comportaient pas) et sur les 205 l'incluant 108 ont été vérifiés sur le terrain pour une journée de travail. 
 
-Après reflexion, j'ai décidé de mettre faux au nom d'espèce des platanes. 
+Dans ces cas la photo fût aussi utilisée et fût d'une aide précieuse.
+
+Lors de la première expérience la validité de l'information botanique a été codée comme ceci : 
 
 `bota` est le champs correspondant à l'exactitude de l'information botanique. Il peut prendre les valeurs de :
 
@@ -114,11 +124,21 @@ Pour simplifier un recodage par info à été fait :
 * `bota_genre` : 0 = faux et (`bota` = 0, 5) 1 bon (`bota` = 1, 2, 3, 4 et 6) et NA si pas d'info
 * `bota_especie` :  0 = faux et 1 bon (`bota` = 3) et NA si pas d'info
 
+C'est cette forme de codage qui a été gardé par la suite. 
+
+#### Difficultés rencontrées et choix dans les cas limites
+
+Après réflexion, j'ai décidé de mettre faux au nom d'espèce des platanes. 
+
+
 `Ajout` : correspond à un arbre non présent dans la base, que les participants ont trouvé et qui existe bien. Attention, il est aussi possible que cela soit des arbustes qui sont problématiques dans la définition d'un arbre.  
+
 
 # Premiers résultats 
 
 ## Synthèse rapide
+
+### Expèrience du 29 juin 
 
 Le tableau \@ref(tab:test) indique pour chaque participant le nombre de relevés effectués (`nb_releve`), le nombre de relevés avec le nom commun, le genre et l'espèce de renseignés (`nb_commun`, `nb_genre` et `nb_espece`) et le nombre de ces relevés qui sont bon pour chaque catégorie botanique (ex : `genre_bon` pour le nombre de relevés ou le genre est bon). 
 
@@ -140,7 +160,9 @@ kable(tableau_participants, caption = 'Informations botaniques par participants'
 ```
 
 
-## Distances 
-
 
 La distance moyenne entre deux relevés d'arbres les plus proches est de 11,48 m et sa médiane est de 10,16. 90% de ces distances sont comprises entres 2,52 et 19,93 m.
+
+### Expèrience du 16 septembre 
+
+blablab

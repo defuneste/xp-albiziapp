@@ -115,3 +115,55 @@ xp_st_e_anim
 anim_save("xp_st_e_anim.gif" , animation = last_animation())
 
 
+# . -------------------------------------------------------------------------- =============
+# III - une carte animée du 16 - 09 ----------------------------------------------------------------- =============
+# . -------------------------------------------------------------------------- =============
+
+## 1 - Fond de cartes  =======
+# ici je prend chez stamen, il faut une bbox bb() de sf 
+xp_st_e <- ggmap(get_stamenmap(bb(zone.shp, output = "matrix"),zoom = 16, maptype = "terrain-lines"))
+
+
+# str(xp_st_e)
+# bb(x = xp_st_e$data$lon, y = xp_st_e$data$lat)
+
+arbre_xp_zone.coord <-st_coordinates(arbre_xp_zone.shp)
+arbre_xp_zone.coord <- as.data.frame(arbre_xp_zone.coord)
+
+arbre_xp_zone.shp[bb(x = xp_st_e$data$lon, y = xp_st_e$data$lat),]
+
+obs_timing <- st_coordinates(newObservation.shp)
+obs_timing <- as.data.frame(obs_timing)
+obs_timing$date <- newObservation.shp$date
+obs_timing$username <- newObservation.shp$username
+
+# obs_timing$participant <- "Particpant 1"
+# obs_timing$participant[obs_timing$username == "tjoliveau"] <- "Particpant 2"
+# obs_timing$participant[obs_timing$username == "JitenshaNiko"] <- "Particpant 3"
+# obs_timing$participant[obs_timing$username == "MathDu"] <- "Particpant 4"
+# obs_timing$participant[obs_timing$username == "Yoann Duriaux"] <- "Particpant 5"
+# obs_timing$participant[obs_timing$username == "pofx"] <- "Particpant 6"
+# obs_timing$participant[obs_timing$username == "Catherine JHG"] <- "Particpant 7"
+
+unique(obs_timing$username)
+
+# animation::ani.options(ani.width= 1000, ani.height=1000, ani.res = 1000)
+# animation::ani.options()
+
+xp_st_e_anim <- xp_st_e + 
+  geom_point(aes(x = 4.3860717, y = 45.4496287), size = 4, pch = "M") +# localisation mixeur
+  geom_point(data = arbre_xp_zone.coord, aes(x = X, y = Y), size = 0.75, col = "#208842", alpha = 0.5) +
+  #geom_point(data = obs_timing, aes(x = X, y = Y), size = 2.5) + 
+  geom_point(data = obs_timing, aes(x = X, y = Y, colour = username), size = 2.5) + 
+  xlab("") + ylab("") +
+  ggtitle("Test d'Albiziapp",
+          subtitle = 'time:{frame_time}') +
+  transition_components(date) +
+  shadow_mark() 
+
+animate(xp_st_e_anim , height = 800, width =800)
+
+anim_save("xp_st_e_16-09bigger.gif" , animation = last_animation())
+
+unique(newObservation.shp$username)
+
