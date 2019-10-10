@@ -100,19 +100,16 @@ f_unlist <- function(une_list_un_niveau, un_nom_de_champ) {
            un_nom_de_champ)) # on indexe sur une variable de nom confidence}
 }
 
-xp_16_09_bota.shp$hasImage <- f_unlist(newObservation[["object"]], "hasImage") #has image
-xp_16_09_bota.shp$confiance <- f_unlist(newObservation[["object"]], "confidence") #confidence
+xp_16_09_bota.shp$hasImage <- f_unlist(newObservation[["object"]], "confidence") #has image
+xp_16_09_bota.shp$confiance <- f_unlist(newObservation[["object"]], "hasImage") #confidence
 xp_16_09_bota.shp$id <- unlist(newObservation[1]) #id de mongoDB
 
 ## 3 - on "annonymise" ============================
 
 # dans ce cas transform va passer le tibble en df
-xp_16_09_bota.shp <- transform(xp_16_09_bota.shp,participant=as.numeric(factor(username)))
+xp_16_09_bota.shp <- transform(xp_16_09_bota.shp,Participant=as.numeric(factor(username)))
 
 
 ## 4 - onroganise le tout ======================
 xp_16_09_bota.shp <- xp_16_09_bota.shp[,c(15,1,16,2:11, 13,14,12)]
 
-names(xp_bota.shp)
-names(xp_16_09_bota.shp)
-xp_bota.shp <- xp_bota.shp[,c(15,16, 1,10,2,3,4,5,6,12,13,14,7,8,9,16,17,11)]

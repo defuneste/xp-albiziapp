@@ -120,18 +120,43 @@ J'avais fait une seule variable car j'avais l'impression de forte corrélation, 
 
 Pour simplifier un recodage par info à été fait : 
 
-* `bota_commun` : 0  = faux (`bota` = 0, 1, 4, 6) et 1 bon (`bota` = 2, 3 ou 5) et NA si pas d'info (ne devrait-on pas mettre 0 ?)
-* `bota_genre` : 0 = faux et (`bota` = 0, 5) 1 bon (`bota` = 1, 2, 3, 4 et 6) et NA si pas d'info
-* `bota_especie` :  0 = faux et 1 bon (`bota` = 3) et NA si pas d'info
+* `commun_bon` : 0  = faux (`bota` = 0, 1, 4, 6) et 1 bon (`bota` = 2, 3 ou 5) et NA si pas d'info (ne devrait-on pas mettre 0 ?)
+* `genre_bon` : 0 = faux et (`bota` = 0, 5) 1 bon (`bota` = 1, 2, 3, 4 et 6) et NA si pas d'info
+* `espece_bon` :  0 = faux et 1 bon (`bota` = 3) et NA si pas d'info
 
 C'est cette forme de codage qui a été gardé par la suite. 
 
 #### Difficultés rencontrées et choix dans les cas limites
 
-Après réflexion, j'ai décidé de mettre faux au nom d'espèce des platanes. 
+Il y a plusieurs cas pouvant poser problème sur ce que l'on entend comme un arbre "validé". On a d'abord le cas d'arbustes qui peuvent être inclus dans des haies ou isolés comme des troènes (cf. figure : \@ref(fig:troene)) ou des rosiers. Il y a aussi le cas de jeunes arbres ou arbustes qui peuvent devenir des arbres de plus grandes statures mais qui sont pour le moment de petites tailles (cf. figure : \@ref(fig:budleia)). 
 
 
-`Ajout` : correspond à un arbre non présent dans la base, que les participants ont trouvé et qui existe bien. Attention, il est aussi possible que cela soit des arbustes qui sont problématiques dans la définition d'un arbre.  
+(ref:troene) Petit troène absent de la base
+
+```{r, troene, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:troene)' }
+knitr::include_graphics("visualisation/troene.JPG")
+```
+
+
+(ref:budleia) Jeune buddleja absent de la base
+
+```{r, budleia, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:budleia)' }
+knitr::include_graphics("visualisation/budleia.JPG")
+```
+
+
+Le système via genre/nom commun/espèce permet d'éviter de mettre juste "faux" pour les platanes. Il faudra cependant bien faire attention dans l'analyse à des effets d'espèces (des espèces plus difficiles, on reproduit tout le temps la même erreur)
+
+#### Arbres présents sur le terrain et absent de la base
+
+`Ajout` : correspond à un arbre non présent dans la base, que les participants ont trouvé et qui existe bien (cf. figure : \@ref(fig:robinia)). Les arbustes mentionnées plus haut sont aussi souvent dans cette catégorie.  
+
+(ref:robinia) Robinier faux acacia dans une friche, absent de la base
+
+```{r, robinia, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:robinia)' }
+knitr::include_graphics("visualisation/robinia.JPG")
+```
+
 
 
 # Premiers résultats 
@@ -140,7 +165,7 @@ Après réflexion, j'ai décidé de mettre faux au nom d'espèce des platanes.
 
 ### Expèrience du 29 juin 
 
-Le tableau \@ref(tab:test) indique pour chaque participant le nombre de relevés effectués (`nb_releve`), le nombre de relevés avec le nom commun, le genre et l'espèce de renseignés (`nb_commun`, `nb_genre` et `nb_espece`) et le nombre de ces relevés qui sont bon pour chaque catégorie botanique (ex : `genre_bon` pour le nombre de relevés ou le genre est bon). 
+Le tableau \@ref(tab:test) indique pour chaque participant le nombre de relevés effectués (`nb_releve`), le nombre de relevés avec le nom commun, le genre et l'espèce de renseignés (`commun_bon`, `genre_bon` et `espece_bon`) et le nombre de ces relevés qui sont bon pour chaque catégorie botanique (ex : `genre_bon` pour le nombre de relevés ou le genre est bon). 
 
 
 ```{r, test, fig.align = 'center', echo = FALSE}
@@ -149,11 +174,11 @@ tableau_participants <- xp_bota.shp %>%
   group_by(Participant) %>% # on groupe par participants
   summarise(nb_releve = n(), # nombre de nouvelles observations par participants
             nb_commun = sum(!is.na(common)), # nombre de nom commun renseignés 
-            commun_bon = sum(bota_commun, na.rm = T), #nombre de non commun bon
+            commun_bon = sum(commun_bon, na.rm = T), #nombre de non commun bon
             nb_genre = sum(!is.na(genus)), # nombre de genre renseignés
-            genre_bon = sum(bota_genus, na.rm = T), # nombre de genre bon
+            genre_bon = sum(genre_bon, na.rm = T), # nombre de genre bon
             nb_espece = sum(!is.na(specie)), # nombre d'especes latin renseigné
-            espece_bon = sum(bota_specie, na.rm = T) # nombre d'espèce de bon
+            espece_bon = sum(espece_bon, na.rm = T) # nombre d'espèce de bon
             ) 
 library(knitr)
 kable(tableau_participants, caption = 'Informations botaniques par participants', align = c( "c","c","c","c","c", "c","c","c"))

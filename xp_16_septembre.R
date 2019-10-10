@@ -28,3 +28,14 @@ table(xp_16_09_bota.shp$username)
 
 names(xp_bota.shp )
 
+##.###################################################################################33
+## III. une seule db ====
+##.#################################################################################33
+
+names(xp_bota.shp)
+names(xp_16_09_bota.shp)
+
+xp_bota.shp <- subset(xp_bota.shp, select = -bota)
+xp.shp <- rbind(as.data.frame(xp_16_09_bota.shp), as.data.frame(xp_bota.shp))
+
+xp.shp[xp.shp$genus == "Platanus",]
