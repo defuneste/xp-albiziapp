@@ -168,7 +168,7 @@ knitr::include_graphics("visualisation/robinia.JPG")
 Le tableau \@ref(tab:test) indique pour chaque participant le nombre de relevés effectués (`nb_releve`), le nombre de relevés avec le nom commun, le genre et l'espèce de renseignés (`commun_bon`, `genre_bon` et `espece_bon`) et le nombre de ces relevés qui sont bon pour chaque catégorie botanique (ex : `genre_bon` pour le nombre de relevés ou le genre est bon). 
 
 
-```{r, test, fig.align = 'center', echo = FALSE}
+```{r, test, fig.align = 'center', echo = FALSE, results="asis"}
 tableau_participants <- xp_bota.shp %>% 
   st_set_geometry(value = NULL) %>%  # on drop la geométrie
   group_by(Participant) %>% # on groupe par participants
@@ -180,8 +180,12 @@ tableau_participants <- xp_bota.shp %>%
             nb_espece = sum(!is.na(specie)), # nombre d'especes latin renseigné
             espece_bon = sum(espece_bon, na.rm = T) # nombre d'espèce de bon
             ) 
-library(knitr)
-kable(tableau_participants, caption = 'Informations botaniques par participants', align = c( "c","c","c","c","c", "c","c","c"))
+
+library(DT)
+datatable(tableau_participants)
+
+cat("<tableau>",paste0("<caption>", "(#tab:test)", "caption", ' Informations botaniques par participants', "</caption>"),"</table>", sep ="\n")
+
 ```
 
 
