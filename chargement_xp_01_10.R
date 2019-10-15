@@ -37,9 +37,6 @@ newObservation<- newObservation[newObservation$username != "tjoliveau",]
 newObservation<- newObservation[newObservation$username !=  "gick",]
 newObservation<- newObservation[newObservation$username !=  "defuneste",]
 
-dim(newObservation)
-
-unique(newObservation$username)
 
 ### zone de l'xp
 zone.shp <- st_read("data/zone_se.shp") # ouverture du fichier de zone 
@@ -78,17 +75,11 @@ df_bota$genus <- unlist(df_bota$genus)
 
 newObservation.shp <- bind_cols(newObservation.shp, df_bota) %>% select(-"authorName")
 
+# les champs à compléter
+newObservation.shp$commun_bon <- NULL
+newObservation.shp$genre_bon  <- NULL
+newObservation.shp$gespece_bon <- NULL
 
-# point de départ de l'experimentation 
-
-mixeur.shp <- st_point(c(4.3860717, 45.4496287), dim = "XY") # localisation du mixeur
-
-# on prend les arbres que l'on connait 
-arbre_xp.shp <- st_read("data/arbres_se_final.geojson")
-# limité à la zone
-arbre_xp_zone.shp <- arbre_xp.shp[zone.shp,]
-
-newObservation.shp <- bind_cols(newObservation.shp, df_bota) %>% select(-"authorName")
 # ici on delimite la zone, dans ce cas cela à peu d'effet mais il faut faire attention 
 # pour la suite notament sur les extraction à partir de newObservation qui peut avoir une longueur différente
 
@@ -97,7 +88,7 @@ newObservation.shp <- bind_cols(newObservation.shp, df_bota) %>% select(-"author
 # on sauve 
 st_write(newObservation.shp, "data/xp_01_10_2019.geojson")
 
-xp_16_09_bota.shp <- st_read("data/xp_16_09_2019.geojson")
+xp_16_09_bota.shp <- st_read("data/xp_01_10_2019.geojson")
 
 xp_16_09_bota.shp <- xp_16_09_bota.shp[!is.na(xp_16_09_bota.shp$verif),]
 
