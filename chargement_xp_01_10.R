@@ -37,6 +37,9 @@ newObservation<- newObservation[newObservation$username != "tjoliveau",]
 newObservation<- newObservation[newObservation$username !=  "gick",]
 newObservation<- newObservation[newObservation$username !=  "defuneste",]
 
+dim(newObservation)
+
+unique(newObservation$username)
 
 ### zone de l'xp
 zone.shp <- st_read("data/zone_se.shp") # ouverture du fichier de zone 
@@ -75,22 +78,28 @@ df_bota$genus <- unlist(df_bota$genus)
 
 newObservation.shp <- bind_cols(newObservation.shp, df_bota) %>% select(-"authorName")
 
-# les champs à compléter
-newObservation.shp$commun_bon <- NULL
-newObservation.shp$genre_bon  <- NULL
-newObservation.shp$gespece_bon <- NULL
 
+# point de départ de l'experimentation 
+
+mixeur.shp <- st_point(c(4.3860717, 45.4496287), dim = "XY") # localisation du mixeur
+
+# on prend les arbres que l'on connait 
+arbre_xp.shp <- st_read("data/arbres_se_final.geojson")
+# limité à la zone
+arbre_xp_zone.shp <- arbre_xp.shp[zone.shp,]
+
+newObservation.shp <- bind_cols(newObservation.shp, df_bota) %>% select(-"authorName")
 # ici on delimite la zone, dans ce cas cela à peu d'effet mais il faut faire attention 
 # pour la suite notament sur les extraction à partir de newObservation qui peut avoir une longueur différente
 
 # newObservation.shp <- newObservation.shp[zone.shp,] je decoupe par la zone sinon je perds un point en bordure ...
 
 # on sauve 
-st_write(newObservation.shp, "data/xp_01_10_2019.geojson")
+#st_write(newObservation.shp, "data/xp_01_10_2019.geojson")
 
-xp_16_09_bota.shp <- st_read("data/xp_01_10_2019.geojson")
+xp_01_10_bota.shp <- st_read("data/xp_01_10_2019.geojson")
 
-xp_16_09_bota.shp <- xp_16_09_bota.shp[!is.na(xp_16_09_bota.shp$verif),]
+# xp_16_09_bota.shp <- xp_16_09_bota.shp[!is.na(xp_16_09_bota.shp$verif),]
 
 ## 2 - Modification du fichier avec bota ================
 
@@ -101,15 +110,15 @@ f_unlist <- function(une_list_un_niveau, un_nom_de_champ) {
            un_nom_de_champ)) # on indexe sur une variable de nom confidence}
 }
 
-xp_16_09_bota.shp$hasImage <- f_unlist(newObservation[["object"]], "confidence") #has image
-xp_16_09_bota.shp$confiance <- f_unlist(newObservation[["object"]], "hasImage") #confidence
-xp_16_09_bota.shp$id <- unlist(newObservation[1]) #id de mongoDB
+xp_01_10_bota.shp$hasImage <- f_unlist(newObservation[["object"]], "hasImage") #has image
+xp_01_10_bota.shp$confiance <- f_unlist(newObservation[["object"]], "confidence") #confidence
+xp_01_10_bota.shp$id <- unlist(newObservation[1]) #id de mongoDB
 
-## 3 - on "annonymise" ============================
+## 3 - on "annonymise" ============================ 
 
 # dans ce cas transform va passer le tibble en df
-xp_16_09_bota.shp <- transform(xp_16_09_bota.shp,Participant=as.numeric(factor(username)))
+xp_01_10_bota.shp <- transform(xp_01_10_bota.shp,Participant = as.numeric(factor(username)))
 
 
 ## 4 - onroganise le tout ======================
-xp_16_09_bota.shp <- xp_16_09_bota.shp[,c(15,1,16,2:11, 13,14,12)]
+xp_01_10_bota.shp <- xp_01_10_bota.shp[,c(15,1,16,2:11, 13,14,12)]
