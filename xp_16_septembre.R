@@ -20,6 +20,8 @@ dim(xp_16_09_bota.shp)
 
 # xp du 01/10/2019
 source("chargement_xp_01_10.R")
+summary(xp_01_10_bota.shp)
+dim(xp_01_10_bota.shp)
 
 
 
@@ -27,11 +29,21 @@ source("chargement_xp_01_10.R")
 ## II. une seule db ====
 ##.#################################################################################33
 
-names(xp_bota.shp)
-names(xp_16_09_bota.shp)
+# on vérifie nom et ordres des colonnes
+names(xp_bota.shp) == names(xp_16_09_bota.shp)
+names(xp_bota.shp) == names(xp_01_10_bota.shp)
 
-xp_bota.shp <- subset(xp_bota.shp, select = -bota)
-xp.shp <- rbind(as.data.frame(xp_16_09_bota.shp), as.data.frame(xp_bota.shp))
+# on fusionne le tout
+# ici je suis resté en Rbase pe faire en dplyr pour ne pas perdre la géométrie
+xp.dat <- rbind(as.data.frame(xp_16_09_bota.shp), as.data.frame(xp_bota.shp), as.data.frame(xp_01_10_bota.shp))
+
+# on vérifie 
+summary(xp.shp)
+dim(xp.shp)
+
+# on en refait un objet sf
+xp.shp <- st_as_sf(xp.dat, sf_column_name = "geometry")
+
 
 xp.shp[xp.shp$genus == "Platanus",]
 

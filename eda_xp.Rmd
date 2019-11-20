@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 source("chargement_xp.R")
 source("chargement_xp_16_09.R")
+source("chargement_xp_01_10.R")
 
 ## chargement des libraries
 library(ggplot2)
@@ -30,9 +31,9 @@ library(spatstat)
 
 L'application a été testée trois fois :
 
-* Le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 125 arbres (relevés) ont été comptés entre les participants (figure : \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
+* Le samedi 29 juin 2019 de 10h30 à 12h00 et regroupait 7 participants. 119 arbres (relevés) ont été comptés entre les participants (figure : \@ref(fig:releveactivite)). Le nombre de relevés par participant varie de 10 à 40 arbres. 
 * Le lundi 16 septembre de 15h40 à 17h00 et regroupait `r length(unique(xp_16_09_bota.shp$username))` participants. `r nrow(xp_16_09_bota.shp)` arbres ont été comptés. 
-* Le mardi 1 octobre de XX à XX .....
+* Le mardi 1 octobre de XX à XX et regroupait `r length(unique(xp_01_10_bota.shp$username))` participants. `r nrow(xp_01_10_bota.shp)` arbres ont été comptés
 
 ## Zone de test
 

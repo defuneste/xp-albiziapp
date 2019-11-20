@@ -122,3 +122,5 @@ xp_01_10_bota.shp <- transform(xp_01_10_bota.shp,Participant = as.numeric(factor
 
 ## 4 - onroganise le tout ======================
 xp_01_10_bota.shp <- xp_01_10_bota.shp[,c(15,1,16,2:11, 13,14,12)]
+
+print("le nom du fichier de l'expérience du 16/09/2019 est xp_01_10_bota.shp")
