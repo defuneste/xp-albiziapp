@@ -185,3 +185,5 @@ xp_bota.shp <- xp_bota.shp[zone.shp,]
 
 # réorganiser les colonne, un extract
 xp_bota.shp <- xp_bota.shp[,c(15,1,10,2,3,4,5,6,12,13,14,7,8,9,16,17,11)]
+
+print("le nom du fichier de l'expérience du 16/09/2019 est xp_bota.shp")

@@ -38,7 +38,7 @@ L'application a été testée trois fois :
 
 ### Localisation et limite de la zone de test
 
-La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. Ce sont des axes simples à reconnaître même pour quelqu'un de non familier de la zone. 
+La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot-Manufacture d'armes. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. Ce sont des axes simples à reconnaître même pour quelqu'un de non familier de la zone. 
 
 ```{r zonetest, fig.align = 'center', echo=FALSE, message=FALSE, fig.cap="Carte de présentation de la zone de test"}
 load(file = "data/xp_st_e.RData")
@@ -54,12 +54,12 @@ L'endroit est entièrement couverte par un wifi et dispose de prises de chargeme
 
 ### Arbres de la zone de test
 
-Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. 
+Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. Les arbres peuvent y être présents en alignement, en petits bosquets et dans des parcs. 
 
 Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
 
 Les arbres sont en moyennes à 5,53 m les uns des autres, avec une médiane de 5,35 m et pour 90% des arbres cette distance est comprise entre 1,75 et 9,73 m. 
-(note olivier, au regard des activités il serait bon de regarder la distance au prochain genre différents)
+(note olivier, au regard des activités il serait bon de regarder la distance au prochain genre différents, pe aussi quantifier un peu plus l'hétérogeneité)
 
 ## Les 5 activités
 
@@ -71,9 +71,7 @@ Il y a eu 5 activités de proposés :
 * 4 : "Identifiez 3 relevés d'expert (cercle bleu clignotant)"
 * 5 : "Faites un maximum de relevé en un temps limite"
 
-Il était aussi possible de faire un relevé hors activité (6). 
-
-Les activités 1 et 2 demandent un nombre précis de relevés pour être validés (respectivement 5 et 3). 
+Il était aussi possible de faire un relevé hors activité (6). Les activités 1 et 2 demandent un nombre précis de relevés pour être validés (respectivement 5 et 3). Les participants pouvaient être répartis en deux groupes. Le premier n'avait que ces activités alors que le second avait en plus un système de point gratifiant l'ajout d'infomations (mettre le tableau ?) et de trophés (idem?)
 
 ```{r, releveactivite, fig.align = 'center', echo = FALSE, fig.cap="Nombre de reĺevés par participants en fonction des activités"}
 ggplot(data = xp_bota.shp, aes(x = Participant)) +
@@ -90,9 +88,11 @@ ggplot(data = xp_bota.shp, aes(x = Participant)) +
 
 ## Travail sur les données 
 
+A la fin de chaque expérience un fichier de type geojson était extrait de la base. La vérification des genres et espèces a été completé sous QGIS (version ?). La mise en forme et l'analyse c'est ensuite faite sur R (version ?).
+
 ### Travail non effectué 
 
-Pour le moment aucun travail sur l'emplacement exacte des arbres n'a pas été mené. 
+Pour le moment aucun travail sur l'emplacement exacte des arbres n'a pas été mené. [à ajouter en quoi c'est probèmatique] 
 
 ### Validation genre et espèce
 
@@ -100,9 +100,9 @@ Pour le moment aucun travail sur l'emplacement exacte des arbres n'a pas été m
 
 La vérification des genres et espèces c'est fait dans un premier temps à l'aide d'un SIG "bureau" en comparant le relevé de l'utilisateur à ce que nous connaissions via la base de données. C'est difficile de l'automatiser car l'arbre le plus proche n'est pas obligatoirement celui relevé. Dans le cas de doute, relevé loin d'un arbre pouvant correspondre ou une erreur peu probable (espèce vraiment différente) nous sommes allés directement sur le terrain pour vérifier.
 
-Pour la première expérience cela correspondait à `r sum(!is.na(xp_bota.shp$verif))` pour `r sum(!is.na(xp_bota.shp$bota))` relevés avec une information botanique (genre, espèce, nom commun) et représentait une mâtinée de travail sur le terrain. La seconde expérience comportait proportionnellement plus d'informations botaniques (seulement 3 relevés n'en comportaient pas) et sur les 205 l'incluant 108 ont été vérifiés sur le terrain pour une journée de travail. 
+Pour la première expérience cela correspondait à `r sum(!is.na(xp_bota.shp$verif))` pour `r sum(!is.na(xp_bota.shp$bota))` relevés avec une information botanique (genre, espèce, nom commun) et représentait une mâtinée de travail sur le terrain. La seconde expérience comportait proportionnellement plus d'informations botaniques (seulement 3 relevés n'en comportaient pas) et sur les 205 l'incluant 108 ont été vérifiés sur le terrain pour une journée de travail. Enfin pour la dernière, qui comportaient le moins de relevés (nombre?), seulement 33 ont eux bersoin d'être verifiés. [petit bilan ?]
 
-Dans ces cas la photo fût aussi utilisée et fût d'une aide précieuse.
+Dans ces cas la photo fût aussi utilisée, via `albiziapp explorer` et fût d'une aide précieuse.
 
 Lors de la première expérience la validité de l'information botanique a été codée comme ceci : 
 
@@ -145,7 +145,7 @@ knitr::include_graphics("visualisation/budleia.JPG")
 ```
 
 
-Le système via genre/nom commun/espèce permet d'éviter de mettre juste "faux" pour les platanes. Il faudra cependant bien faire attention dans l'analyse à des effets d'espèces (des espèces plus difficiles, on reproduit tout le temps la même erreur)
+Le système via genre/nom commun/espèce permet d'éviter de mettre juste "faux" pour les platanes. Il faudra cependant bien faire attention dans l'analyse à des effets d'espèces (des espèces plus difficiles, reproduit-on tout le temps la même erreur : cas d'une essence mal identifiée plusieurs fois)
 
 #### Arbres présents sur le terrain et absent de la base
 
@@ -156,8 +156,6 @@ Le système via genre/nom commun/espèce permet d'éviter de mettre juste "faux"
 ```{r, robinia, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:robinia)' }
 knitr::include_graphics("visualisation/robinia.JPG")
 ```
-
-
 
 # Premiers résultats 
 
