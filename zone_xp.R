@@ -13,7 +13,8 @@ library(dplyr) # manip données
 #Ici On va ne garder qu'une partie des données pour l'experimentation d'albiziapp
 
 
-zone.shp <- st_read("data/zone_se.shp") # ouverture du fichier de zone 
+source("chargement_xp_finale.R")
+
 st_crs(zone.shp)
 summary(zone.shp)
 sum(st_area(zone.shp))/10000 # surface de la zone ici en ha car je suis en m2 en 4326
