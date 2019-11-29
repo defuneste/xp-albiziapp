@@ -8,6 +8,10 @@ library(sf) # package spatial
 library(lubridate) # les dates 
 library(forcats) # pour les facteurs
 library(dplyr) # manip données
+library(leaflet)
+library(ggplot2)
+library(ggmap)
+library(tmaptools)
 
 ## 1 - Les  données de la zone  ================
 #Ici On va ne garder qu'une partie des données pour l'experimentation d'albiziapp
@@ -15,63 +19,42 @@ library(dplyr) # manip données
 
 source("chargement_xp_finale.R")
 
-st_crs(zone.shp)
-summary(zone.shp)
-sum(st_area(zone.shp))/10000 # surface de la zone ici en ha car je suis en m2 en 4326
-sum(st_area(zone.shp[1,]))/10000 # surface de la zone reduite ici 
 
-#On ne garde que ce qui dans zone. 
+sum(st_area(zone.shp))/10000 # surface de la zone ici en ha car je suis en m2 en 2154
 
-
-# attention ici on est en lat/long et st_intersetcs fait comme si on était projeté
-# dans notre cas c'est pas grave car on est sur une petite surface mais du coup si on utilise un 
-# st_intersect c'est apparament mieux d'être en projeté
-arbres_xp <- arbres_se.final.shp[zone.shp,] # un clip sur la zone totale
-arbres_xp_reduit <- arbres_se.final.shp[zone.shp[1,],] # un clip sur la zone réduite
-summary(arbres_xp)
-summary(arbres_xp_reduit)
-
-#st_write(arbres_xp, dsn = "data/arbres_se_xp.geojson")
-
-
-plot(st_geometry(arbres_xp )) # un plot pour verifier (on passe par le geom car on veut juste verifier les points pas toutes les variables)
+#une carte rapide
 plot(st_geometry(zone.shp))
-plot(st_geometry(zone.shp[1,]))
-
-
-
-## une carte
-
-
-arbres_xp$arbre <- 1
-st_crs(arbres_xp)
+plot(st_geometry(arbre_xp_zone.shp), pch = 16, add = T, col = "forestgreen") # un plot pour verifier (on passe par le geom car on veut juste verifier les points pas toutes les variables)
 
 ############## attention il faut changer pas mal de truc ========================
 ## ici j'ai utilisé ggmap mais les API sur les site de tuiles sont de moins en moins open donc il faudra pe un jour le changer
 # bb est une fonction de tmaptools qui permet de retourner une bounding box sous un format matrix
 # on va chez stamen, on prends toner-lite, préciser le zoom aide pour le dl des tuiles
-xp_st_e <- ggmap(get_stamenmap(bb(zone.shp, output = "matrix"),zoom = 16, maptype = "terrain-lines"))
+xp_st_e <- ggmap(get_stamenmap(bb(st_transform(zone.shp, 4326), output = "matrix"),zoom = 16, maptype = "terrain-lines"))
 xp_st_e +
-  geom_sf(data = arbre_xp_zone.shp, inherit.aes = FALSE, pch = 16, alpha = 0.7, col = "forestgreen", size = 0.5) +
+  geom_sf(data = st_transform(arbre_xp_zone.shp, 4326), inherit.aes = FALSE, pch = 16, alpha = 0.7, col = "forestgreen", size = 0.5) +
   xlab("") + ylab("")
 
 save(xp_st_e, file = "data/xp_st_e.RData")
 
-carto_se <- leaflet() %>%
+load("data/xp_st_e.RData")
+xp_st_e
+
+
+# 3 - Un leaflet =============
+carto_se <- leaflet() %>% 
   addTiles() %>%
-  addCircleMarkers(data = arbres_xp, radius = 2) 
+  addCircleMarkers(data = st_transform(arbre_xp_zone.shp, 4326),         # repasser en wgs84 
+                   radius = 2, label = ~species, col = "forestgreen")    # cosmetiques + label avec nom latin
 
 carto_se
-
-
 
 ## des stats
 
 # On a un peu trop de genre pour que cela soit lisible sur un graph/carte en dessous de 10 individus species va devenir "autre". Je sais pas encore si je vais le garder. 
 
-
 comptage_xp %>% 
-  # ici on reprend le fichier de comptage et on va attraibuer Autres si on est inf à 10
+  # ici on reprend le fichier de comptage et on va attribuer Autres si on est inf à 10
   # puis on regroupe et recompte
   mutate(espece = if_else(comptage_xp$comptage >= 10, comptage_xp$genus, "Autres")) %>% 
   group_by(espece) %>% 
@@ -80,12 +63,10 @@ comptage_xp %>%
 
 # On regarde la répartition des genres. On va attribuer une zone aux arbres ce qui est sans doute l'option la plus simple (et avec laquelle j'aurais du commencer)
 
-
-
 arbres_xp <- st_join(arbres_xp, zone.shp) # une jointure spatiale, ici on prend tous le fichier comme il est presque vide
 table(arbres_xp$id) # une verif
 
-# un rableau temporaire qui compte l'occurence par genre
+# un tableau temporaire qui compte l'occurence par genre
 temp_order <- arbres_xp %>%  
   st_set_geometry(value = NULL) %>% 
   group_by(genus) %>% 
@@ -93,7 +74,6 @@ temp_order <- arbres_xp %>%
 
 # on le reinjecte dans arbres_xp pour ordonner le futur graph par le nombre d'occurence
 arbres_xp <- left_join (arbres_xp, temp_order, by =c ("genus" = "genus" ))
-
 
 arbres_xp %>% 
   st_set_geometry(value = NULL) %>% # on drop la geométrie
@@ -142,8 +122,6 @@ arbres_xp %>%
 
 #### La distance à un arbre de meme genre
 
-
-
 arbres_xp_dist <- arbres_xp
 arbres_xp_dist$ndistidem <- NA
 
@@ -167,8 +145,6 @@ for(i in 1:length(nom_genre)){
   print(nom_genre[i])} 
 
 # arbres_xp_dist <- dist_same_tree(nom_genre, arbres_xp_dist)
-
-
 
 arbres_xp_dist %>% 
   filter(!is.na(ndistidem)) %>% # ici c'est un filtre des NA cf ligne plus
