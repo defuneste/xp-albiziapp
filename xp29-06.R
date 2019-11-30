@@ -82,13 +82,6 @@ nrow(arbre_xp_zone.shp) # nombre d'arbre
 
 summary(arbre_xp_zone.shp)
 
-# un tableau du nombre d'arbre par genre
-comptage_xp_reduit <- arbre_xp_zone.shp %>% # pour le sous ensemble
-  st_set_geometry(value = NULL) %>% # on drop la geometrie
-  group_by(genus) %>%  # groupe par genus ou species
-  summarize(comptage = n()) %>% # on compte
-  arrange(desc(comptage)) # on range juste pour la lisibilité
-
 # combien d'espèce de prunus
 
 unique(arbre_xp_zone.shp$species[arbre_xp_zone.shp$genus == "Prunus" ])
@@ -143,6 +136,7 @@ length(arbre_plus_proche)
 head(arbre_plus_proche)
 mean(arbre_plus_proche)
 summary(arbre_plus_proche)
+
 library(rethinking)
 PI(arbre_plus_proche) # necessite rethinking 
 
@@ -208,23 +202,4 @@ arbre_plus_proche_genre <- nndist(xp_ppp, by=droplevels(marks(xp_ppp)$genus))
 
 apply(arbre_plus_proche_genre, 1, min)
 
-# . -------------------------------------------------------------------------- =============
-# III - Différents effets de l'envt possible  ----------------------------------------------------------------- =============
-# . -------------------------------------------------------------------------- =============
 
-## 1 - Effet du point de départ  ================
-
-# on peut penser ici le modifier en commencant par une autre activité
-
-# tester différentes distance par rapport à lui
-
-## 2 - Effet par rapport au dernier point  ================
-
-
-## 3 - Effet par rapport à la densité arborée  ================
-
-## 4 - Effet par rapport à la diversité arborée  ================
-
-# . -------------------------------------------------------------------------- =============
-# IV - Différents effets des activités  ----------------------------------------------------------------- =============
-# . -------------------------------------------------------------------------- =============

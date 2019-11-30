@@ -2,6 +2,7 @@
 ## I. zone de l'experimentation ====
 ##.#################################################################################33
 
+library(maptools)
 library(jsonlite) # pour les json
 library(sp) # ancien package spatial toujours présent
 library(sf) # package spatial
@@ -12,15 +13,14 @@ library(leaflet)
 library(ggplot2)
 library(ggmap)
 library(tmaptools)
+library(spatstat)
 
 ## 1 - Les  données de la zone  ================
 #Ici On va ne garder qu'une partie des données pour l'experimentation d'albiziapp
 
-
 source("chargement_xp_finale.R")
 
-
-sum(st_area(zone.shp))/10000 # surface de la zone ici en ha car je suis en m2 en 2154
+sum(as.numeric(st_area(zone.shp)))/10000 # surface de la zone ici en ha car je suis en m2 en 2154
 
 #une carte rapide
 plot(st_geometry(zone.shp))
@@ -33,118 +33,88 @@ plot(st_geometry(arbre_xp_zone.shp), pch = 16, add = T, col = "forestgreen") # u
 xp_st_e <- ggmap(get_stamenmap(bb(st_transform(zone.shp, 4326), output = "matrix"),zoom = 16, maptype = "terrain-lines"))
 xp_st_e +
   geom_sf(data = st_transform(arbre_xp_zone.shp, 4326), inherit.aes = FALSE, pch = 16, alpha = 0.7, col = "forestgreen", size = 0.5) +
-  xlab("") + ylab("")
+  xlab("") + ylab("") +
+  labs(caption = "Fonds OSM, rendu Stamen") +
+  scale_color_manual(values = c("forestgreen" = "forestgreen"), name = "", labels = "Arbres préalablement identifiés")
 
 save(xp_st_e, file = "data/xp_st_e.RData")
 
-load("data/xp_st_e.RData")
-xp_st_e
-
-
-# 3 - Un leaflet =============
+# 2 - Un leaflet =============
 carto_se <- leaflet() %>% 
   addTiles() %>%
   addCircleMarkers(data = st_transform(arbre_xp_zone.shp, 4326),         # repasser en wgs84 
                    radius = 2, label = ~species, col = "forestgreen")    # cosmetiques + label avec nom latin
-
 carto_se
 
-## des stats
+## 3 - des stats ==========
 
 # On a un peu trop de genre pour que cela soit lisible sur un graph/carte en dessous de 10 individus species va devenir "autre". Je sais pas encore si je vais le garder. 
 
-comptage_xp %>% 
-  # ici on reprend le fichier de comptage et on va attribuer Autres si on est inf à 10
-  # puis on regroupe et recompte
-  mutate(espece = if_else(comptage_xp$comptage >= 10, comptage_xp$genus, "Autres")) %>% 
-  group_by(espece) %>% 
-  summarize(comptage = sum(comptage)) %>% 
-  arrange(desc(comptage))
+#nombre d'arbre dans la zone
+nrow(arbre_xp_zone.shp)
+# densité
+nrow(arbre_xp_zone.shp)/(sum(as.numeric(st_area(zone.shp)))/10000)
 
-# On regarde la répartition des genres. On va attribuer une zone aux arbres ce qui est sans doute l'option la plus simple (et avec laquelle j'aurais du commencer)
+# un tableau du nombre d'arbre par genre
+comptage_xp_reduit <- arbre_xp_zone.shp %>% # pour le sous ensemble
+    st_set_geometry(value = NULL) %>% # drop la geometrie
+    group_by(genus) %>%  # groupe par genus ou species
+    summarize(comptage = n()) %>% # comptage
+    arrange(desc(comptage)) # range juste pour la lisibilité
 
-arbres_xp <- st_join(arbres_xp, zone.shp) # une jointure spatiale, ici on prend tous le fichier comme il est presque vide
-table(arbres_xp$id) # une verif
+arbre_xp_zone.shp %>%  
+    st_set_geometry(value = NULL) %>% # drop la geometrie
+    group_by(genus) %>% # group par genus
+    tally() %>%  # compte
+    left_join (arbre_xp_zone.shp, by =c ("genus" = "genus" )) %>%  # merge le compte obtenu sur chaque arbre, c'est pas sexy mais bon 
+        ggplot(aes(x = reorder(genus, n))) + #  fill = as.factor(id))) + # ici on reoder avec n et on met id n factor pour le remplissage
+            geom_bar(fill = "#8BBFDD") + 
+            labs(x ="Genre",
+                ylab ="Nombre d'arbres") +
+            coord_flip() + 
+            theme(axis.text=element_text(size=8)) 
 
-# un tableau temporaire qui compte l'occurence par genre
-temp_order <- arbres_xp %>%  
-  st_set_geometry(value = NULL) %>% 
-  group_by(genus) %>% 
-  tally()
-
-# on le reinjecte dans arbres_xp pour ordonner le futur graph par le nombre d'occurence
-arbres_xp <- left_join (arbres_xp, temp_order, by =c ("genus" = "genus" ))
-
-arbres_xp %>% 
-  st_set_geometry(value = NULL) %>% # on drop la geométrie
-  ggplot(aes(x= reorder(genus, n))) + #  fill = as.factor(id))) + # ici on reoder avec n et on met id n factor pour le remplissage
-  geom_bar(fill = "#8BBFDD") + 
-  labs(x="Genre",
-       ylab="Nombre d'arbres") +
-  coord_flip() + 
-  #scale_fill_manual(values = c("#90D18D", "#8BBFDD"),  # des couleurs moins piquantes
-  #                                 name = "Zonage", labels = c("Elargi", "Reduit")) + # la legende
-  theme(axis.text=element_text(size=8)) # on diminue la taille des labels
+# fct_explicit_na(species) si on veut avoir les espèces
+# mutate(espece = if_else(comptage_xp$comptage >= 10, comptage_xp$genus, "Autres")) un bout de code au besoin si on veut éviter la longue traine
 
 ## des stats de distance et NN
 
 ## ici on passe en sp avec sf
-xp_sp <- as(st_transform(arbres_xp, 2154), "Spatial")
+xp_sp <- as(arbre_xp_zone.shp, "Spatial")
+class(xp_sp)
 ## ici on passe en ppp avec maptools
 xp_ppp <- as(xp_sp, "ppp") 
+class(xp_ppp)
 
 ## on verifie 
-class(xp_ppp)
-str(xp_ppp)
 
 ## on plot
-plot(xp_ppp$x, xp_ppp$y)
+# plot(xp_ppp$x, xp_ppp$y)
 # ici juste dans un veteur
 # nndist vient de spatstat 
-arbre_plus_proche <- nndist(xp_ppp)
-class(arbre_plus_proche )
-length(arbre_plus_proche )
-head(arbre_plus_proche )
-
-## on sauve comme une nouvelle variable
-arbres_xp$dist <- nndist(xp_ppp)
+# et calcul la distance la plus proche dans un objet ppp
+arbre_xp_zone.shp$dist <- nndist(xp_ppp)
 
 # un graph
-arbres_xp %>% 
-  ggplot(aes(dist)) + #colour = as.factor(id))) + # il faut un facteur pour utiliser colours
+arbre_xp_zone.shp %>% 
+  ggplot(aes(dist)) + 
   geom_freqpoly(binwidth = 1) + # freqpoly avec un binwidth de 1 m 
-  # scale_colour_manual(values = (c("#90D18D", "#8BBFDD")),  # des couleurs moins piquantes
-  #                                  name = "Zonage", labels = c("Elargi", "Reduit")) + # la legende
   xlab("distance (m)") +
-  ylab("Nombres d'arbres")
-
-
+  ylab("Nombres d'arbres") + 
+  theme_bw()
 
 #### La distance à un arbre de meme genre
 
-arbres_xp_dist <- arbres_xp
-arbres_xp_dist$ndistidem <- NA
+source("fonction_xp_albiziapp.R")
 
-## attention il faut plus de deux arbres sinon nndist va retourner un vecteur de taille 0 alors que 1 est le minimum pour l'indexation
-dist_same_tree <- function(nom_genre, arbres_sf) {
-  # on filtre sur un genre
-  arbres_xp_filter <- filter(arbres_sf, genus == nom_genre) %>% 
-    select('ref:FR:Saint-Etienne:tree', geometry)
-  # on converti ce sf en ppp filtrer, on passe aussi en lambert
-  arbres_xp_filter.ppp <- as(as(st_transform(arbres_xp_filter, 2154), "Spatial"), "ppp")
-  # on passe nndist dans le tible filtré
-  arbres_sf$ndistidem[arbres_sf$genus == nom_genre] <- nndist(arbres_xp_filter.ppp)
-  return(arbres_sf)
-}
+nom_genre <- c("Platanus", "Prunus", "Sorbus", "Corylus", "Pinus", "Magnolia") 
 
-nom_genre <- c("Platanus", "Prunus", "Acer", "Pinus", "Tilia", "Sorbus", "Quercus", "Cedrus", "Alnus", "Populus") 
-
+dist_same_tree("Platanus", arbre_xp_zone.shp)
 
 for(i in 1:length(nom_genre)){
-  arbres_xp_dist <- dist_same_tree(nom_genre[i], arbres_xp_dist)
-  print(nom_genre[i])} 
+    arbre_xp_zone2.shp <- dist_same_tree(nom_genre[i], arbre_xp_zone.shp)
+    print(nom_genre[i])} 
 
-# arbres_xp_dist <- dist_same_tree(nom_genre, arbres_xp_dist)
 
 arbres_xp_dist %>% 
   filter(!is.na(ndistidem)) %>% # ici c'est un filtre des NA cf ligne plus
