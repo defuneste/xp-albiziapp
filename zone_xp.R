@@ -93,7 +93,24 @@ class(xp_ppp)
 # ici juste dans un veteur
 # nndist vient de spatstat 
 # et calcul la distance la plus proche dans un objet ppp
-arbre_xp_zone.shp$dist <- nndist(xp_ppp)
+arbre_xp_zone.shp$dist_same_tree <- nndist(xp_ppp, by = arbre_xp_zone.shp$genus)
+
+nom_genre <- "Platanus"
+
+#  nncross prend X et Y deux jeux de ppp et va chercher le point Y le plus proche de X
+
+arbre_X_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre,]
+arbre_Y_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus != nom_genre,]
+
+temp <-   nncross(
+X = as(as(arbre_X_filter, "Spatial"), "ppp"), 
+Y = as(as(arbre_Y_filter, "Spatial"), "ppp")
+)
+
+arbre_Y_filter[temp$which,]
+
+dim(nndist(xp_ppp, by = arbre_xp_zone.shp$genus))
+dim(arbre_xp_zone.shp)
 
 # un graph
 arbre_xp_zone.shp %>% 
