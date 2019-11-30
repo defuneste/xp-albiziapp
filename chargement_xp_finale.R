@@ -20,6 +20,11 @@ arbre_xp.shp <- sf::st_read("data/arbres_se_final.geojson")
 arbre_xp.shp <- st_transform(arbre_xp.shp, 2154)
 # limité à la zone
 arbre_xp_zone.shp <- arbre_xp.shp[zone.shp,]
+str(arbre_xp_zone.shp)
+#correction de facteur en trop 
+arbre_xp_zone.shp$genus <- factor(arbre_xp_zone.shp$genus)
+arbre_xp_zone.shp$species <- factor(arbre_xp_zone.shp$species)
+arbre_xp_zone.shp$species.fr <- factor(arbre_xp_zone.shp$species.fr)
 rm(arbre_xp.shp)
 
 # 2 - données d' xp ==================

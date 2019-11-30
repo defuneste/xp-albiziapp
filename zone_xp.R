@@ -26,7 +26,7 @@ sum(as.numeric(st_area(zone.shp)))/10000 # surface de la zone ici en ha car je s
 plot(st_geometry(zone.shp))
 plot(st_geometry(arbre_xp_zone.shp), pch = 16, add = T, col = "forestgreen") # un plot pour verifier (on passe par le geom car on veut juste verifier les points pas toutes les variables)
 
-############## attention il faut changer pas mal de truc ========================
+############## attention il faut changer pas mal de truc
 ## ici j'ai utilisé ggmap mais les API sur les site de tuiles sont de moins en moins open donc il faudra pe un jour le changer
 # bb est une fonction de tmaptools qui permet de retourner une bounding box sous un format matrix
 # on va chez stamen, on prends toner-lite, préciser le zoom aide pour le dl des tuiles
@@ -46,7 +46,7 @@ carto_se <- leaflet() %>%
                    radius = 2, label = ~species, col = "forestgreen")    # cosmetiques + label avec nom latin
 carto_se
 
-## 3 - des stats ==========
+## 3 - Des stats ==========
 
 # On a un peu trop de genre pour que cela soit lisible sur un graph/carte en dessous de 10 individus species va devenir "autre". Je sais pas encore si je vais le garder. 
 
@@ -93,28 +93,40 @@ class(xp_ppp)
 # ici juste dans un veteur
 # nndist vient de spatstat 
 # et calcul la distance la plus proche dans un objet ppp
-arbre_xp_zone.shp$dist_same_tree <- nndist(xp_ppp, by = arbre_xp_zone.shp$genus)
+arbre_xp_zone.shp$dist_same_tree <- nndist(xp_ppp)
 
-nom_genre <- "Platanus"
+nom_genre <- unique(arbre_xp_zone.shp$genus)
 
 #  nncross prend X et Y deux jeux de ppp et va chercher le point Y le plus proche de X
 
-arbre_X_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre,]
-arbre_Y_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus != nom_genre,]
+# on initailise
+arbre_xp_zone.shp$dist_diff_tree <- NA
+arbre_xp_zone.shp$closer_diff_tree <- NA
 
-temp <-   nncross(
-X = as(as(arbre_X_filter, "Spatial"), "ppp"), 
-Y = as(as(arbre_Y_filter, "Spatial"), "ppp")
-)
+# une boucle sur tout les genres
+for (i in 1:length(nom_genre)) {
+# X et Y : X le genre souhaité et Y le restes
+    arbre_X_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre[i],]
+    arbre_Y_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus != nom_genre[i],]
 
-arbre_Y_filter[temp$which,]
-
-dim(nndist(xp_ppp, by = arbre_xp_zone.shp$genus))
-dim(arbre_xp_zone.shp)
+# le df resultats de nncross est stocké dans un df temp
+    dist_other_tree <- nncross(
+              X = as(as(arbre_X_filter, "Spatial"), "ppp"), # il faut convertire en ppp
+              Y = as(as(arbre_Y_filter, "Spatial"), "ppp")
+                  )
+# la colonne which correspond à l'index de Y, on remplace par la ref de l'arbre
+    dist_other_tree$which <- arbre_Y_filter$'ref.FR.Saint.Etienne.tree'[dist_other_tree$which]
+# attribution a chaque genre des distances en m à l'arbre d'un autre genre le plus proches
+    arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre[i],]$dist_diff_tree <- dist_other_tree$dist
+# attribution a chaque genre de la ref de l'arbre le plus proches
+    arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre[i],]$closer_diff_tree <- dist_other_tree$which
+}
 
 # un graph
 arbre_xp_zone.shp %>% 
-  ggplot(aes(dist)) + 
+  tidyr::gather(key = "type_dist", value = "dist_m", dist_same_tree, dist_diff_tree) %>% 
+  st_set_geometry(value = NULL) %>%
+  ggplot(aes(dist_m, color = type_dist)) + 
   geom_freqpoly(binwidth = 1) + # freqpoly avec un binwidth de 1 m 
   xlab("distance (m)") +
   ylab("Nombres d'arbres") + 
@@ -131,14 +143,4 @@ dist_same_tree("Platanus", arbre_xp_zone.shp)
 for(i in 1:length(nom_genre)){
     arbre_xp_zone2.shp <- dist_same_tree(nom_genre[i], arbre_xp_zone.shp)
     print(nom_genre[i])} 
-
-
-arbres_xp_dist %>% 
-  filter(!is.na(ndistidem)) %>% # ici c'est un filtre des NA cf ligne plus
-  ggplot(aes(ndistidem, fill = genus)) + # il faut un facteur pour utiliser colours
-  geom_histogram(binwidth = 1) + # freqpoly avec un binwidth de 1 m 
-  scale_x_continuous(limits = c(0,30)) +
-  facet_wrap(~genus, ncol = 2) +
-  xlab("distance (m)") +
-  ylab("Nombres d'arbres")
 

@@ -35,33 +35,6 @@ L'application a été testée trois fois :
 * Le lundi 16 septembre de 15h40 à 17h00 et regroupait `r length(unique(xp_16_09_bota.shp$username))` participants. `r nrow(xp_16_09_bota.shp)` arbres ont été comptés. 
 * Le mardi 1 octobre de XX à XX et regroupait `r length(unique(xp_01_10_bota.shp$username))` participants. `r nrow(xp_01_10_bota.shp)` arbres ont été comptés
 
-## Zone de test
-
-### Localisation et limite de la zone de test
-
-La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot-Manufacture d'armes. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. Ce sont des axes simples à reconnaître même pour quelqu'un de non familier de la zone. 
-
-```{r zonetest, fig.align = 'center', echo=FALSE, message=FALSE, fig.cap="Carte de présentation de la zone de test"}
-load(file = "data/xp_st_e.RData")
-xp_st_e +
-  geom_sf(data = arbre_xp_zone.shp, inherit.aes = FALSE, pch = 16, alpha = 0.7, aes(col = "forestgreen"), size = 0.5, show.legend = "point") +
-  geom_point(aes(x = 4.3860717, y = 45.4496287), size = 4, pch = "M") +
-  xlab("") + ylab("") +
-  labs(caption = "Fonds OSM, rendu Stamen") +
-  scale_color_manual(values = c("forestgreen" = "forestgreen"), name = "", labels = "Arbres préalablement identifiés")
-```
-
-L'endroit est entièrement couverte par un wifi et dispose de prises de chargement de portables en accès libre. 
-
-### Arbres de la zone de test
-
-Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. Les arbres peuvent y être présents en alignement, en petits bosquets et dans des parcs. 
-
-Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
-
-Les arbres sont en moyennes à 5,53 m les uns des autres, avec une médiane de 5,35 m et pour 90% des arbres cette distance est comprise entre 1,75 et 9,73 m. 
-(note olivier, au regard des activités il serait bon de regarder la distance au prochain genre différents, pe aussi quantifier un peu plus l'hétérogeneité)
-
 ## Les 5 activités
 
 Il y a eu 5 activités de proposés : 

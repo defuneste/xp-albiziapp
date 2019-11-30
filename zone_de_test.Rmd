@@ -1,0 +1,72 @@
+---
+title: "Zone_de_test"
+author: "Olivier Leroy"
+date: "30 novembre 2019"
+output: 
+  bookdown::html_document2:
+        theme: readable
+        toc: true
+        toc_float: true
+        number_sections: true
+        fig_caption: yes
+        code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+## chargement des libraries
+library(ggplot2)
+library(bookdown)
+library(sf)
+library(ggmap)
+library(tmaptools)
+library(spatstat)
+library(maptools)
+library(jsonlite) # pour les json
+library(sp) # ancien package spatial toujours présent
+library(lubridate) # les dates 
+library(forcats) # pour les facteurs
+library(dplyr) # manip données
+library(leaflet)
+library(ggplot2)
+
+source("chargement_xp_finale.R")
+```
+
+
+# Localisation et limite de la zone de test
+
+La zone du test (figure : \@ref(fig:zonetest)) a eu lieu à Saint-Etienne dans le quartier Carnot-Manufacture d'armes. Elle est délimitée au nord par le campus de Manufacture de l'Université Jean Monet, à l'est par le boulevard Thiers, à l'ouest par la ligne de tramway et au sud par le boulevard Jules Janin. Ce sont des axes simples à reconnaître même pour quelqu'un de non familier. L'endroit est entièrement couvert par un wifi et dispose de prises de chargement de portables en accès libre. 
+
+```{r zonetest, figs.align = 'center',  message=FALSE, fig.cap="Carte de présentation de la zone de test"}
+load(file = "data/xp_st_e.RData")
+xp_st_e +
+  geom_sf(data = st_transform(arbre_xp_zone.shp, 4326), inherit.aes = FALSE, pch = 16, alpha = 0.7, aes(col = "forestgreen"), size = 0.5, show.legend = "point") +
+  geom_point(aes(x = 4.3860717, y = 45.4496287), size = 4, pch = "M") +
+  xlab("") + ylab("") +
+  labs(caption = "Fonds OSM, rendu Stamen") +
+  scale_color_manual(values = c("forestgreen" = "forestgreen"), name = "", labels = "Arbres préalablement identifiés")
+```
+
+<button class="btn btn-primary" data-toggle="collapse" data-target="#BlockName_carnotleaflet"> Affichage de la carte </button>
+<div id="BlockName_carnotleaflet" class="collapse">
+
+```{r, carnotleaflet}
+carto_se <- leaflet() %>% 
+  addTiles() %>%
+  addCircleMarkers(data = st_transform(arbre_xp_zone.shp, 4326),         # repasser en wgs84 
+                   radius = 2, label = ~species, col = "forestgreen")    # cosmetiques + label avec nom latin
+carto_se
+```
+
+</div>
+
+# Arbres de la zone de test
+
+Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. Les arbres peuvent y être présents en alignement, en petits bosquets et dans des parcs. 
+
+Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
+
+Les arbres sont en moyennes à 5,53 m les uns des autres, avec une médiane de 5,35 m et pour 90% des arbres cette distance est comprise entre 1,75 et 9,73 m. 
+(note olivier, au regard des activités il serait bon de regarder la distance au prochain genre différents, pe aussi quantifier un peu plus l'hétérogeneité)
