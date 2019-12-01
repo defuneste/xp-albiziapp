@@ -30,6 +30,7 @@ library(forcats) # pour les facteurs
 library(dplyr) # manip données
 library(leaflet)
 library(ggplot2)
+library(plotly)
 
 source("chargement_xp_finale.R")
 ```
@@ -66,7 +67,87 @@ carto_se
 
 Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nrow(arbre_xp_zone.shp)` arbres soit `r round(nrow(arbre_xp_zone.shp)/round(st_area(zone.shp)/10000, 2),2)` arbres par hectare. Les arbres peuvent y être présents en alignement, en petits bosquets et dans des parcs. 
 
-Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
 
-Les arbres sont en moyennes à 5,53 m les uns des autres, avec une médiane de 5,35 m et pour 90% des arbres cette distance est comprise entre 1,75 et 9,73 m. 
-(note olivier, au regard des activités il serait bon de regarder la distance au prochain genre différents, pe aussi quantifier un peu plus l'hétérogeneité)
+## Répartition par genre 
+
+Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% (cf. figure : \@ref(fig:genrezone)) des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
+
+
+```{r genrezone, figs.align = 'center', fig.cap="Répartition des arbres par genre"}
+
+genrezone <- arbre_xp_zone.shp %>%  
+    st_set_geometry(value = NULL) %>% # drop la geometrie
+    group_by(genus) %>% # group par genus
+    tally() %>%  # compte
+    left_join (arbre_xp_zone.shp, by =c ("genus" = "genus" )) %>%  # merge le compte obtenu sur chaque arbre, c'est pas sexy mais bon 
+        ggplot(aes(x = reorder(genus, n))) + #  fill = as.factor(id))) + # ici on reoder avec n et on met id n factor pour le remplissage
+            geom_bar(fill = "#8BBFDD") + 
+            labs(x ="Genre",
+                ylab ="Nombre d'arbres") +
+            coord_flip() + 
+            theme(axis.text=element_text(size=8))
+ggplotly(genrezone)
+```
+
+
+## Répartition spatiale 
+
+```{r}
+## ici on passe en sp avec sf
+xp_sp <- as(arbre_xp_zone.shp, "Spatial")
+
+## ici on passe en ppp avec maptools
+xp_ppp <- as(xp_sp, "ppp") 
+
+## on verifie 
+
+## on plot
+# plot(xp_ppp$x, xp_ppp$y)
+# ici juste dans un veteur
+# nndist vient de spatstat 
+# et calcul la distance la plus proche dans un objet ppp
+arbre_xp_zone.shp$dist_same_tree <- nndist(xp_ppp)
+
+
+#  nncross prend X et Y deux jeux de ppp et va chercher le point Y le plus proche de X
+
+# on initailise
+arbre_xp_zone.shp$dist_diff_tree <- NA
+arbre_xp_zone.shp$closer_diff_tree <- NA
+nom_genre <- unique(arbre_xp_zone.shp$genus)
+
+# une boucle sur tout les genres
+for (i in 1:length(nom_genre)) {
+# X et Y : X le genre souhaité et Y le restes
+    arbre_X_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre[i],]
+    arbre_Y_filter <-  arbre_xp_zone.shp[arbre_xp_zone.shp$genus != nom_genre[i],]
+
+# le df resultats de nncross est stocké dans un df temp
+    dist_other_tree <- nncross(
+              X = as(as(arbre_X_filter, "Spatial"), "ppp"), # il faut convertire en ppp
+              Y = as(as(arbre_Y_filter, "Spatial"), "ppp")
+                  )
+# la colonne which correspond à l'index de Y, on remplace par la ref de l'arbre
+    dist_other_tree$which <- arbre_Y_filter$'ref.FR.Saint.Etienne.tree'[dist_other_tree$which]
+# attribution a chaque genre des distances en m à l'arbre d'un autre genre le plus proches
+    arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre[i],]$dist_diff_tree <- dist_other_tree$dist
+# attribution a chaque genre de la ref de l'arbre le plus proches
+    arbre_xp_zone.shp[arbre_xp_zone.shp$genus == nom_genre[i],]$closer_diff_tree <- dist_other_tree$which
+}
+```
+
+
+Les arbres sont en moyennes à `r round(mean(arbre_xp_zone.shp$dist_same_tree, na.rm = TRUE),2)` m les uns des autres, avec une médiane de `r round(median(arbre_xp_zone.shp$dist_same_tree, na.rm = TRUE),2)` m et pour 90% des arbres cette distance est comprise entre 1,75 et 9,73 m. Vu les activités, il est aussi intéressant de regarder la distance à l'arbre d'un autre genre.  En moyenne, il faut `r round(mean(arbre_xp_zone.shp$dist_diff_tree, na.rm = TRUE),2)` m pour trouver un arbre d'un genre différent (la medianne est à `r round(median(arbre_xp_zone.shp$dist_diff_tree, na.rm = TRUE),2)`). La figure \@ref(fig:repartitionspatiale) reprend la distribution des valeurs des distances (dist_diff_tree correspond à la distance à l'arbre d'un autre genre et dist_same_tree à l'arbre le plus proche).
+
+```{r repartitionspatiale, figs.align = 'center', fig.cap="Répartition des arbres par genre"}
+repartitionspatiale <- arbre_xp_zone.shp %>% 
+  tidyr::gather(key = "type_dist", value = "dist_m", dist_same_tree, dist_diff_tree) %>% 
+  st_set_geometry(value = NULL) %>%
+  ggplot(aes(dist_m, color = type_dist)) + 
+  geom_freqpoly(binwidth = 1) + # freqpoly avec un binwidth de 1 m 
+  xlab("distance (m)") +
+  ylab("Nombres d'arbres") + 
+  theme_bw()
+ggplotly(repartitionspatiale)
+```
+

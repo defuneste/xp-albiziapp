@@ -95,6 +95,9 @@ class(xp_ppp)
 # et calcul la distance la plus proche dans un objet ppp
 arbre_xp_zone.shp$dist_same_tree <- nndist(xp_ppp)
 
+summary(arbre_xp_zone.shp$dist_same_tree)
+mean(arbre_xp_zone.shp$dist_same_tree)
+
 nom_genre <- unique(arbre_xp_zone.shp$genus)
 
 #  nncross prend X et Y deux jeux de ppp et va chercher le point Y le plus proche de X
