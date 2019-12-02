@@ -1,7 +1,5 @@
 ###### scripts de fonctions pour les xp d'albiziapp 
 
-
-
 # 1- fonctions de distances 
 
 ## la fonction prend un genre, un objet de point_sf et necessite pas mal de package spatiaux, surtout pour les conversions

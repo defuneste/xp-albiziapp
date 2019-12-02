@@ -2,7 +2,7 @@
 ## Script rapide pour regarder le json de l'xp ====
 ##.#################################################################################33
 
-
+#### script plus à jour à suuprimer une fois tout repomper
 
 # . -------------------------------------------------------------------------- =============
 # I - Chargement de packages supplementaire et des données  ----------------------------------------------------------------- =============
@@ -76,18 +76,6 @@ ggplot(aes(x = code_activ, fill = username)) +
 
 ## 5 - stats de base  ================
 
-### 5.1 Info sur la zone de test ================
-st_area(zone.shp) # surface de la zone
-nrow(arbre_xp_zone.shp) # nombre d'arbre 
-
-summary(arbre_xp_zone.shp)
-
-# combien d'espèce de prunus
-
-unique(arbre_xp_zone.shp$species[arbre_xp_zone.shp$genus == "Prunus" ])
-
-unique(arbre_xp_zone.shp$species)
-
 ### 5.2 Info sur l'xp ================
 summary(xp_bota.shp)
 dim(xp_bota.shp)
@@ -106,100 +94,9 @@ xp_bota.shp %>%
             nb_espece = sum(!is.na(specie)), # nombre d'especes latin renseigné
             ok_commun = sum(nb_commun))  
 
-# nombre de relevé avec au moins une info. Attention utilise NA dans bota pour cela
-sum(!is.na(xp_bota.shp$bota))
-
 # nombre de relevé vérifiés
 sum(!is.na(xp_bota.shp$verif))
 
-## 6 - Distances entre les points ================
 
-### 6.1 Distances à l'arbres le plus proches ====================
-
-## ici on passe en sp avec sf
-xp_sp <- as(st_transform(arbre_xp_zone.shp , 2154), "Spatial")
-## ici on passe en ppp avec maptools
-xp_ppp <- as.ppp(xp_sp) 
-
-## on verifie 
-class(xp_ppp)
-str(xp_ppp)
-
-## on plot
-plot(xp_ppp$x, xp_ppp$y)
-# ici juste dans un veteur
-# nndist vient de spatstat 
-arbre_plus_proche <- nndist(xp_ppp)
-class(arbre_plus_proche)
-length(arbre_plus_proche)
-# une serie de stats de verif
-head(arbre_plus_proche)
-mean(arbre_plus_proche)
-summary(arbre_plus_proche)
-
-library(rethinking)
-PI(arbre_plus_proche) # necessite rethinking 
-
-## on sauve comme une nouvelle variable
-arbre_xp_zone.shp$dist <- nndist(xp_ppp)
-
-# un graph
-arbre_xp_zone.shp %>% 
-    ggplot(aes(dist)) + # il faut un facteur pour utiliser colours
-    geom_freqpoly(binwidth = 1) + 
-    xlab("distance (m)") +
-    ylab("Nombres d'arbres")
-
-
-
-## ici on passe en sp avec sf, on le fait pour xp_bota
-## penser à en faire une fonction
-xp_sp <- as(st_transform(xp_bota.shp[zone.shp,] , 2154), "Spatial")
-## ici on passe en ppp avec maptools
-xp_ppp <- as.ppp(xp_sp) 
-
-## on verifie 
-class(xp_ppp)
-str(xp_ppp)
-
-## on plot
-plot(xp_ppp$x, xp_ppp$y)
-# ici juste dans un veteur
-# nndist vient de spatstat 
-arbre_plus_proche <- nndist(xp_ppp)
-class(arbre_plus_proche)
-length(arbre_plus_proche)
-# une serie de stats de verif
-head(arbre_plus_proche)
-mean(arbre_plus_proche)
-summary(arbre_plus_proche)
-library(rethinking)
-PI(arbre_plus_proche) # necessite rethinking 
-
-## on sauve comme une nouvelle variable
-arbre_xp_zone.shp$dist <- nndist(xp_ppp)
-
-# un graph
-arbre_xp_zone.shp %>% 
-  ggplot(aes(dist)) + # il faut un facteur pour utiliser colours
-  geom_freqpoly(binwidth = 1) + 
-  xlab("distance (m)") +
-  ylab("Nombres d'arbres")
-
-### 6.2 Distances à l'arbres d'un genre différent le plus proches ====================
-
-# retourne un tableau avec la distance aà tous les genre
-
-data(ants)
-plot(ants)
-nnda <- nndist(ants, by=marks(ants)) 
-head(nnda)
-
-# ici retourne un tableau de l'arbre le plus proche par genre 
-# droplevel a été utilisé pour virer les levels non utilisés je devrais le faire avant
-# des genre contenu dans marks 
-arbre_plus_proche_genre <- nndist(xp_ppp, by=droplevels(marks(xp_ppp)$genus))
-
-apply(arbre_plus_proche_genre, 1, min)
 
 

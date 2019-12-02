@@ -86,8 +86,6 @@ class(xp_sp)
 xp_ppp <- as(xp_sp, "ppp") 
 class(xp_ppp)
 
-## on verifie 
-
 ## on plot
 # plot(xp_ppp$x, xp_ppp$y)
 # ici juste dans un veteur
