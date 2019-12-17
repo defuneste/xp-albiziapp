@@ -31,15 +31,41 @@ source("chargement_xp_finale.R")
 
 summary(xp_total.shp)
 
-# relevé par participant 
+# une facteur pour les xp
+# ici on va prendre les mois des xp et les passer en facteur
+xp_total.shp$mois <- as.factor(lubridate::month(xp_total.shp$date))
+
+# nb de participants par xp
+table(xp_total.shp$mois)
+
+xp_total.shp %>% 
+  st_drop_geometry() %>% # drop de la geometry 
+  group_by(Participant, mois) %>% # group par participants et par xp
+  summarize(n = n()) %>% # on compte les relevés par xp et participants
+  ggplot(aes(x = n)) + # un plot rapide
+  geom_histogram(binwidth = 1)
+
+# relevés par participant 
 
 xp_total.shp %>% 
   st_drop_geometry() %>% 
-  group_by(Participant) %>% 
-  tally() %>% 
-  ggplot(aes(y = n)) +
-  geom_boxplot()
+  group_by(Participant, mois) %>% 
+  summarize(n = n()) %>% 
+  ggplot(aes(y = n, color = mois)) +
+  geom_boxplot(alpha = .5) + 
+  # ici je veux ajouter les points par dessus
+  labs(y = "nbr de relevés") +
+  # il me faut virer l'axes de x et le grid de x
+  theme_bw()
 
+#  indicateurs thierry 
+
+xp_total.shp %>% 
+  st_drop_geometry() %>% 
+  group_by(username) %>% 
+  summarize(indic_genre = sum(genre_bon, na.rm = T),
+            indic_commun = sum(commun_bon, na.rm = T),
+            indic_sp = sum(espece_bon, na.rm = T))
 
 # . -------------------------------------------------------------------------- =============
 # III - Différents effets de l'envt possible  ----------------------------------------------------------------- =============
