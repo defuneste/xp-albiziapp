@@ -63,9 +63,12 @@ xp_total.shp %>%
 xp_total.shp %>% 
   st_drop_geometry() %>% 
   group_by(username) %>% 
-  summarize(indic_genre = sum(genre_bon, na.rm = T),
+  dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
             indic_commun = sum(commun_bon, na.rm = T),
-            indic_sp = sum(espece_bon, na.rm = T))
+            indic_sp = sum(espece_bon, na.rm = T),
+            n = dplyr::n())
+
+xp_total.shp[xp_total.shp$username == "GradelerM", ]
 
 # . -------------------------------------------------------------------------- =============
 # III - Différents effets de l'envt possible  ----------------------------------------------------------------- =============
