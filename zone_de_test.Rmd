@@ -70,7 +70,7 @@ Cette zone représente `r round(st_area(zone.shp)/10000, 2)` ha, comprend `r nro
 
 ## Répartition par genre 
 
-Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% (cf. figure : \@ref(fig:genrezone)) des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces). 62 espèces se répartissent dans ces genres. 
+Il y a entre 41 et 42 genres d'arbres (en fonction d'où on range les macromeles). Prés de 50% (cf. figure : \@ref(fig:genrezone)) des arbres se retrouvent être soit des *Platanus* (une seule espèce) soit des *Prunus* (6 espèces).  
 
 
 ```{r genrezone, figs.align = 'center', fig.cap="Répartition des arbres par genre"}
@@ -88,6 +88,27 @@ genrezone <- arbre_xp_zone.shp %>%
             theme(axis.text=element_text(size=8))
 ggplotly(genrezone)
 ```
+
+
+62 espèces se répartissent dans ces genres.
+
+
+```{r specieszone, figs.align = 'center', fig.cap="Répartition des arbres par espèce"}
+
+specieszone <- arbre_xp_zone.shp %>%  
+    st_set_geometry(value = NULL) %>% # drop la geometrie
+    group_by(species) %>% # group par genus
+    tally() %>%  # compte
+    left_join (arbre_xp_zone.shp, by =c ("species" = "species" )) %>%  # merge le compte obtenu sur chaque arbre, c'est pas sexy mais bon 
+        ggplot(aes(x = reorder(species, n))) + #  fill = as.factor(id))) + # ici on reoder avec n et on met id n factor pour le remplissage
+            geom_bar(fill = "#8BBFDD") + 
+            labs(x ="Espece",
+                ylab ="Nombre d'arbres") +
+            coord_flip() + 
+            theme(axis.text=element_text(size=8))
+ggplotly(specieszone)
+```
+
 
 
 ## Répartition spatiale 
