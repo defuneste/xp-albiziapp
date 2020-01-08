@@ -17,6 +17,7 @@ library(gganimate) # animation avec ggplot et map
 library(spatstat) # outils d'analyse point pattern
 library(maptools) # des outils principalements de conversion
 library(purrr) # prog fonctionnel en tidyverse
+library(lubridate) # un wrapper pour des fonctions plus simples de dates
 library(sp)
 library(sf)
 library(plotly)
@@ -63,10 +64,24 @@ xp_total.shp %>%
 xp_total.shp %>% 
   st_drop_geometry() %>% 
   group_by(username) %>% 
+            # nombre de genre bon 
   dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
+            # nombre de nom commun bon       
             indic_commun = sum(commun_bon, na.rm = T),
+            # nombre d'especes bon
             indic_sp = sum(espece_bon, na.rm = T),
-            n = dplyr::n())
+            # comptage des relevés
+            n = dplyr::n(),
+            # attention on est en minute et en decimal de minute pas des secondes 
+            # si on mets 0 on aura que des minutes 
+            # ce temps correspond à l'ecart entre le premier relevé et le second
+            # si il n'y a qu'un relevé sa valeur ne peut donc qu'être que de 0
+            # c'est le cas pour deux utilisateurs
+            # on ne devrait pe les garder ?
+            temps_min = round((max(date) - min(date)),2))
+
+
+names(xp_total.shp)
 
 xp_total.shp[xp_total.shp$username == "GradelerM", ]
 
