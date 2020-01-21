@@ -22,7 +22,7 @@ library(sp)
 library(sf)
 library(plotly)
 
-## 2 - Données  =======
+## 2 - Données  =========
 
 source("chargement_xp_finale.R")
 
@@ -42,7 +42,7 @@ table(xp_total.shp$mois)
 xp_total.shp %>% 
   st_drop_geometry() %>% # drop de la geometry 
   group_by(Participant, mois) %>% # group par participants et par xp
-  summarize(n = n()) %>% # on compte les relevés par xp et participants
+  dplyr::summarize(n = n()) %>% # on compte les relevés par xp et participants
   ggplot(aes(x = n)) + # un plot rapide
   geom_histogram(binwidth = 1)
 
@@ -51,7 +51,7 @@ xp_total.shp %>%
 xp_total.shp %>% 
   st_drop_geometry() %>% 
   group_by(Participant, mois) %>% 
-  summarize(n = n()) %>% 
+  dplyr::summarize(n = dplyr::n()) %>% 
   ggplot(aes(y = n, color = mois)) +
   geom_boxplot(alpha = .5) + 
   # ici je veux ajouter les points par dessus
@@ -59,10 +59,45 @@ xp_total.shp %>%
   # il me faut virer l'axes de x et le grid de x
   theme_bw()
 
-#  indicateurs thierry 
+## 1 - Indicateurs Thierry  =========
 
-xp_total.shp %>% 
+# distance parcourue
+# ici on va faire une distance à vole d'oiseau, il faut aussi prendre le point de départ qui est le mixeur
+
+# on fait un tableau point de départ 
+username <- unique(xp_total.shp$username)
+date <- rep(min(xp_total.shp$date) - 60, length(unique(xp_total.shp$username)))
+point_depart <- data.frame(username, date)
+
+# dont le point de départ est le mixeur
+st_geometry(point_depart) <- rep(mixeur.shp, length(username))
+
+# c'est un peu gourmant en ressource ces 400 calculs de distance pe pas optimisé
+# on obtient ainsi 400 distance en m dont la première est calculée par rapport au mixeur
+temp_dist <- xp_total.shp %>% 
+    # je suis passé en mettre et pas en degré
+    st_transform(2154) %>% 
+    dplyr::select(username, date) %>% 
+    rbind(st_transform(point_depart,  2154)) %>% 
+    group_by(username) %>% 
+    # on part de la date min qui est celle definit dans point de départ 
+    arrange(date) %>% 
+    mutate(
+        # on ne peut pas passer un lag par contre on peut indexer une colonne 
+        lead = geometry[row_number() + 1],
+        # st_distance peut travailler par element
+        dist = st_distance(geometry, lead, by_element = T)
+    ) %>% 
+    # les NA sont un artefact que l'on peut virer
+    filter(!is.na(dist))
+
+# je le rajoute à xt_total.shp
+xp_total.shp$dist_m <- temp_dist$dist
+
+xp_summarize <- xp_total.shp %>% 
   st_drop_geometry() %>% 
+  # on rajoute la distance    
+  mutate(dist_m = temp_dist$dist) %>% 
   group_by(username) %>% 
             # nombre de genre bon 
   dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
@@ -78,8 +113,21 @@ xp_total.shp %>%
             # si il n'y a qu'un relevé sa valeur ne peut donc qu'être que de 0
             # c'est le cas pour deux utilisateurs
             # on ne devrait pe les garder ?
-            temps_min = round((max(date) - min(date)),2))
+            temps_min = min(date),
+            temp_max = max(date),
+            # ici c'est la somme de la distance
+            dist_cumul = round(sum(dist_m),2)) %>% 
+    mutate(durée_secs = round((temp_max - temps_min),2)) %>% 
+    select(-c(temp_max, temps_min))
 
+xp_total.shp %>% 
+    group_by(username, mois) %>% 
+    ggplot(aes(y = dist_m, color = mois)) +
+    geom_boxplot(alpha = .5) + 
+    # ici je veux ajouter les points par dessus
+    labs(y = "distance (m)") +
+    # il me faut virer l'axes de x et le grid de x
+    theme_bw()
 
 names(xp_total.shp)
 

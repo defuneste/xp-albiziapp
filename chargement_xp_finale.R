@@ -13,7 +13,7 @@ zone.shp <- sf::st_transform(zone.shp, 2154)
 
 # point de départ de l'experimentation 
 mixeur.shp <-st_sfc(st_point(c(4.3860717, 45.4496287)), crs = 4326) # localisation du mixeur
-mixeur.shp <- sf::st_transform(mixeur.shp ,2154)
+mixeur.shp <- sf::st_transform(mixeur.shp, 2154)
 
 # chargement des arbres que l'on connait 
 arbre_xp.shp <- sf::st_read("data/arbres_se_final.geojson")
@@ -31,7 +31,7 @@ rm(arbre_xp.shp)
 
 xp_total.dat <- readRDS("data/xp_total.rds")
 xp_total.shp <- st_as_sf(xp_total.dat, sf_column_name = "geometry")
-xp_total.shp <- st_transform(xp_total.shp, 4362)
+xp_total.shp <- st_transform(xp_total.shp, 4326)
 st_write(xp_total.dat, "data/xp_total.geojson")
 rm(xp_total.dat)
 
