@@ -75,7 +75,7 @@ st_geometry(point_depart) <- rep(mixeur.shp, length(username))
 # c'est un peu gourmant en ressource ces 400 calculs de distance pe pas optimisé
 # on obtient ainsi 400 distance en m dont la première est calculée par rapport au mixeur
 temp_dist <- xp_total.shp %>% 
-    # je suis passé en mettre et pas en degré
+    # je suis passé en metre et pas en degré
     st_transform(2154) %>% 
     dplyr::select(username, date) %>% 
     rbind(st_transform(point_depart,  2154)) %>% 
@@ -153,6 +153,43 @@ xp_total.shp[xp_total.shp$username == "GradelerM", ]
 # . -------------------------------------------------------------------------- =============
 # IV - Différents effets des activités  ----------------------------------------------------------------- =============
 # . -------------------------------------------------------------------------- =============
+
+
+xp_activite <- xp_total.shp %>% 
+  st_drop_geometry() %>% 
+  # on rajoute la distance    
+  mutate(dist_m = temp_dist$dist) %>% 
+  group_by(username, code_activ) %>% 
+  # nombre de genre bon 
+  dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
+                   # nombre de nom commun bon       
+                   indic_commun = sum(commun_bon, na.rm = T),
+                   # nombre d'especes bon
+                   indic_sp = sum(espece_bon, na.rm = T),
+                   # comptage des relevés
+                   n = dplyr::n(),
+                   # attention on est en minute et en decimal de minute pas des secondes 
+                   # si on mets 0 on aura que des minutes 
+                   # ce temps correspond à l'ecart entre le premier relevé et le second
+                   # si il n'y a qu'un relevé sa valeur ne peut donc qu'être que de 0
+                   # c'est le cas pour deux utilisateurs
+                   # on ne devrait pe les garder ?
+                   temps_min = min(date),
+                   temp_max = max(date),
+                   # ici c'est la somme de la distance
+                   dist_cumul = round(sum(dist_m),2)) %>% 
+  mutate(durée_secs = round((temp_max - temps_min),2)) %>% 
+  select(-c(temp_max, temps_min)) 
+
+
+#une verif des atcivités, le passer en plotly
+# 75 % des cas suivent la regle 
+xp_activite %>% 
+  filter(code_activ <= 2) %>% 
+ggplot(aes(code_activ, y = n)) +
+  geom_boxplot()
+
+
 
 # . -------------------------------------------------------------------------- =============
 # V - Différents effets de la botaniques  ----------------------------------------------------------------- =============
