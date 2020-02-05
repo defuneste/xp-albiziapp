@@ -1,0 +1,140 @@
+---
+title: "Présentation jeux de données XP_albiziapp"
+author: "Olivier Leroy"
+date: "05 frevrier 2020"
+output: 
+  bookdown::html_document2:
+    theme: readable
+    toc: TRUE
+    toc_float: TRUE
+    fig_caption: yes
+    code_folding: hide
+---
+
+```{r, chargement, message=FALSE, include=FALSE}
+library(sf)
+library(dplyr)
+
+xp_total.shp <- st_read("data/xp_total.geojson")
+xp_total.shp <- st_as_sf(xp_total.shp, sf_column_name = "geometry")
+xp_total.shp <- st_transform(xp_total.shp, 4326)
+```
+
+
+# Présentation du fichier
+
+Le fichier `xp_total.geojson` regroupe les trois expériences qui ont eu lieu sur le site de la Manufacture à Saint-Étienne (cf. `zone_de_test`). Ces expériences ont eu lieu le samedi 29 juin , le lundi 16 septembre et le mardi premier octobre 2019.
+
+À la fin de chaque expérience un fichier de type geojson était extrait de la base. La vérification des genres et espèces a été completée sous QGIS (3.8). La mise en forme et l'analyse c'est ensuite faite sur R (3.6.1).
+
+Le travail sous QGIS consistait à :
+
+* valider si l'arbre était présent dans la base de données des arbres de la ville, 
+* verifier si le nom de genre, nom commun et nom latin renseignés étaient bon,
+* indiquer dans la mesure du possible l'identifiant de la base de données des arbres de la ville de l'arbre correspondant pour chaque relevé.
+
+Ce travail est difficile à automatiser car l'arbre le plus proche n'est pas obligatoirement celui relevé. Dans le cas de doute, relevé loin d'un arbre pouvant correspondre ou une erreur peu probable (espèce vraiment différente) nous sommes allés directement sur le terrain pour vérifier.
+
+
+## Cas limites lors de la vérification des informations botaniques
+
+Il y a plusieurs cas pouvant poser problème sur ce que l'on entend comme un arbre "validé". On a d'abord le cas d'arbustes qui peuvent être inclus dans des haies ou isolés comme des troènes (cf. figure : \@ref(fig:troene)) ou des rosiers. Il y a aussi le cas de jeunes arbres ou arbustes qui peuvent devenir des arbres de plus grandes statures mais qui sont pour le moment de petites tailles (cf. figure : \@ref(fig:budleia)). 
+
+
+(ref:troene) Petit troène absent de la base
+
+```{r, troene, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:troene)' }
+knitr::include_graphics("visualisation/troene.JPG")
+```
+
+
+(ref:budleia) Jeune buddleja absent de la base
+
+```{r, budleia, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:budleia)' }
+knitr::include_graphics("visualisation/budleia.JPG")
+```
+
+
+Ces "arbres" sont très majoritairement absent de la base de données des arbres de Saint-Etienne et font l'objet du paragraphe suivant.
+
+
+## Arbres présents sur le terrain et absent de la base
+
+Les arbres de ce type sont indiqués dans `Ajout` qui prend alors la valeur de 1. Les arbustes mentionnées plus haut sont aussi souvent dans cette catégorie mais il y a aussi des cas d'arbres en dehors de la gestion de la ville et donc non referencé comme l'exemple de la figure : \@ref(fig:robinia). 
+
+(ref:robinia) Robinier faux acacia dans une friche, absent de la base
+
+```{r, robinia, echo=FALSE, fig.align = 'center', out.width = '70%', fig.cap = '(ref:robinia)' }
+knitr::include_graphics("visualisation/robinia.JPG")
+```
+
+# Jeux de données et statistiques descriptives
+
+```{r}
+str(xp_total.shp)
+```
+
+Le jeux de données comprend 400 lignes et 17 variables. C'est un objet `spatial` de type "simple feature" et un tableau de données. Chaque ligne correspond à un relevé (`newObservation` dans le json d'albiziapp). L'EPSG utilisé pour le SCR est le 4326 (WGS84). 
+
+
+## Présentation des variables :
+
+`id`: identifiant d'albiziapp pour une action : dans notre cas l'envoi d'un nouveau relevé
+
+`username` : le surnom OSM de l'utilisateur 
+
+`Participant` : un code pour anonymiser les participants, chaque numero correspond à un numero
+
+`date` : date et heure de l'envoi du relevés (format: POSIXct YYYY-MM-DD HH:MM:SS)
+
+`code_activ` : code de l'activité dans laquelle le relevé a été effectué. Il y a 6 valeurs possibles.
+
+Il y a eu 5 activités de proposés : 
+
+* 1 : "Faites 5 relevés"
+* 2 : "Faites 3 relevés de genres différents" 
+* 3 : "Vérifiez 3 relevés d'un autre utilisateur (cercle vert clignotant)"
+* 4 : "Identifiez 3 relevés d'expert (cercle bleu clignotant)"
+* 5 : "Faites un maximum de relevé en un temps limite"
+
+Il était aussi possible de faire un relevé hors activité (`code_activ` 6, cas présent une fois). Les activités 1 et 2 demandent un nombre précis de relevés pour être validés (respectivement 5 et 3). Nous ne devrions pas avoir de nouveaux relevés dans les activités 3 et 4 et pourtant nous en avons 6 et 7 (cf. tableau \@ref(tab:releveactivite)). 
+
+(ref:releveactivite) Répartition des relevés par activités
+
+```{r, releveactivite}
+knitr::kable(t(table(xp_total.shp$code_activ)), caption = "(ref:releveactivite)")
+```
+
+`common` : nom commun donné par l'utilisateur
+
+`specie` : nom latin donné par l'utilisateur
+
+`genus` : non de genre donné par l'utilisateur 
+
+`commun_bon` : le nom commun est il bon :
+
+* 0 Non,
+* 1 Oui, 
+* NA cas  où il n'etait pas renseigné
+
+`genre_bon` : idem mais pour le genre
+
+`espece_bon` : idem mais pour l'espèce
+
+`verif` : utilisé lors des verifications terrains ne devrait pas être gardé
+
+`ajout` : le relevé est il absent de la base de données arbres de SE si 1 il est absent
+
+`hasImage` : l'utilisateur a-t-il envoyé une image : TRUE/FALSE
+
+`confiance` : Ce qu'a renseigné l'utilisateur de son relevé ("Confiant"/"Peu confiant") si il l'a renseigné ("Non renseignée")
+
+```{r}
+knitr::kable(t(table(xp_total.shp$confiance)))
+```
+
+`ref_se` : correspond à l'identifiant d'un arbre dans la base de données de SE. Si c'est un 0 cela correspond à deux cas. Le premier correspond aux arbres non présent dans cette base mais présent sur le terrain (cf `ajout`). Le second correspond à des relevés dont je n'ai absolument la moindre idée de savoir à quoi les rapprocher.
+
+`geonetry` : colonne sf qui contient la geometrie (point) de l'objet
+
+## Une aggrégation au niveau des participants

@@ -101,7 +101,7 @@ xp_summarize <- xp_total.shp %>%
   group_by(username) %>% 
             # nombre de genre bon 
   dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
-            # nombre de nom commun bon       
+            # nombre de nom commun bon, attention si le genre n'est pas present il n'est pas compté comme bon (ni comme faux)     
             indic_commun = sum(commun_bon, na.rm = T),
             # nombre d'especes bon
             indic_sp = sum(espece_bon, na.rm = T),
@@ -147,6 +147,10 @@ xp_total.shp[xp_total.shp$username == "GradelerM", ]
 
 
 ## 3 - Effet par rapport à la densité arborée  ================
+
+
+# des arbres isolés dans aurait plus de chance d'etre pris ?
+# cf tilleuls 
 
 ## 4 - Effet par rapport à la diversité arborée  ================
 

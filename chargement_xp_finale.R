@@ -32,6 +32,6 @@ rm(arbre_xp.shp)
 xp_total.dat <- readRDS("data/xp_total.rds")
 xp_total.shp <- st_as_sf(xp_total.dat, sf_column_name = "geometry")
 xp_total.shp <- st_transform(xp_total.shp, 4326)
-st_write(xp_total.dat, "data/xp_total.geojson")
+#st_write(xp_total.dat, "data/xp_total.geojson")
 rm(xp_total.dat)
 
