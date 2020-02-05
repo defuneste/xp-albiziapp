@@ -6,7 +6,7 @@
 ## elle retourne un objet sf que l'on peut ensuite sauver 
 ## attention il faut plus de deux arbres sinon nndist va retourner un vecteur de taille 0 alors que 1 est le minimum pour l'indexation
 
-dist_same_tree <- function(nom_genre, arbres_sf) {
+dist_same_tree <- function(arbres_sf, nom_genre) {
     if(require("sf")==FALSE)  
         install.packages("sf",  dependencies=c("Depends", "Suggests"))
     if(require("sp")==FALSE)  
