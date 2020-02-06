@@ -15,9 +15,8 @@ output:
 library(sf)
 library(dplyr)
 
-xp_total.shp <- st_read("data/xp_total.geojson")
-xp_total.shp <- st_as_sf(xp_total.shp, sf_column_name = "geometry")
-xp_total.shp <- st_transform(xp_total.shp, 4326)
+source("chargement_xp_finale.R")
+
 ```
 
 
@@ -136,5 +135,14 @@ knitr::kable(t(table(xp_total.shp$confiance)))
 `ref_se` : correspond à l'identifiant d'un arbre dans la base de données de SE. Si c'est un 0 cela correspond à deux cas. Le premier correspond aux arbres non présent dans cette base mais présent sur le terrain (cf `ajout`). Le second correspond à des relevés dont je n'ai absolument la moindre idée de savoir à quoi les rapprocher.
 
 `geonetry` : colonne sf qui contient la geometrie (point) de l'objet
+
+## Renforcement des données
+
+A partir du geojson des données sont produites et rajoutées :
+
+`mois` : le numero du mois de l'expérimentation qui permet de plus facielent que `date` de les filtrer
+
+`dist_m` : la distance parcourue (en "vol d'oiseau" et en m) entre ce relevé (n) et celui d'avant (n-1). Dans le cas du premier relevé cette distance ce fait avec le lieu de départ : le Mixeur. 
+
 
 ## Une aggrégation au niveau des participants
