@@ -68,8 +68,16 @@ temp_dist <- xp_total.shp %>%
         dist = st_distance(geometry, lead, by_element = T)
     ) %>% 
     # les NA sont un artefact que l'on peut virer
-    filter(!is.na(dist))
+    filter(!is.na(dist)) %>% 
+    # j'ai reordonné
+    arrange(username, date)
 
-# rajout à xt_total.shp
+
+# rajout à xp_total.shp et meme reordonné
+xp_total.shp <- xp_total.shp %>% 
+    arrange(username, date)
+
 xp_total.shp$dist_m <- temp_dist$dist
 rm(temp_dist, point_depart)
+
+# st_write(xp_total.shp, "data/xp_renforce.geojson")
