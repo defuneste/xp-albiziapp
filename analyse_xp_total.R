@@ -37,7 +37,6 @@ summary(xp_total.shp)
 
 # 1 Nombre de participants par xp ====================
 
-table(xp_total.shp$mois)
 
 xp_total.shp %>% 
   st_drop_geometry() %>% # drop de la geometry 
@@ -53,11 +52,17 @@ xp_total.shp %>%
   group_by(Participant, mois) %>% 
   dplyr::summarize(n = dplyr::n()) %>% 
   ggplot(aes(y = n, color = mois)) +
-  geom_boxplot(alpha = .5) + 
+  geom_boxplot() + 
   # ici je veux ajouter les points par dessus
   labs(y = "nbr de relevés") +
   # il me faut virer l'axes de x et le grid de x
-  theme_bw()
+  theme_bw() 
+
+xp_total.shp %>% 
+    st_drop_geometry() %>% 
+    group_by(Participant, mois) %>% 
+    dplyr::summarize(n = dplyr::n()) %>% 
+plot_ly(y = ~n, color = ~mois, type = "box")
 
 
 xp_summarize <- xp_total.shp %>% 

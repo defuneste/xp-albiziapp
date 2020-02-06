@@ -1,0 +1,33 @@
+---
+title: "stats descriptive xp albiziapp"
+author: "olivier"
+date: "6 février 2020"
+output: 
+  bookdown::html_document2:
+    theme: readable
+    toc: TRUE
+    toc_float: TRUE
+    fig_caption: yes
+    code_folding: hide
+---
+```{r, include=FALSE, message=FALSE}
+library(sf)
+library(dplyr)
+
+source("chargement_xp_finale.R")
+```
+
+
+# Statistiques générales descriptives
+
+Il y un total de 400 relevés pour 40 participants sur 3 expériences. 
+
+```{r}
+xp_total.shp %>% 
+    st_drop_geometry() %>% 
+    group_by(mois) %>% 
+    summarize(nb_participants = n_distinct(username),
+              nb_releves = n() )
+
+```
+
