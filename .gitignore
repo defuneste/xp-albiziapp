@@ -10,3 +10,5 @@
 # le fichier des data viz
 /visualisation
 *.html
+# on vire le profilage de code 
+ice-prof

@@ -2,27 +2,29 @@
 # I - Chargement de packages supplementaire et des données  ----------------------------------------------------------------- =============
 # . -------------------------------------------------------------------------- =============
 
-
-
 ## 1 - Package supplemtaire  =======
 
 #attention certaines fonctions sont masquées 
+# manipulation des données 
 library(tidyverse) # envt pour des donnees de type tidy pas trop volumineuse
+library(lubridate) # un wrapper pour des fonctions plus simples de dates
+library(purrr) # prog fonctionnel en tidyverse
+
+# données spatiales
 library(rgdal) # 
+library(sp) # ancien package de gestion de donnees spatiales 
+library(sf) # le nouveau
+library(spatstat) # outils d'analyse point pattern
+library(maptools) # des outils principalements de conversion
+
+# visu plus outils
 library(tmap) # cartes statics
 library(tmaptools) # outils de carte dont palette_color
 library(leaflet) # cartes dynamiques
-library(ggmap) # outils pour les cartes statics avec tuiles
-library(gganimate) # animation avec ggplot et map
-library(spatstat) # outils d'analyse point pattern
-library(maptools) # des outils principalements de conversion
-library(purrr) # prog fonctionnel en tidyverse
-library(lubridate) # un wrapper pour des fonctions plus simples de dates
-library(sp)
-library(sf)
-library(plotly)
+library(plotly) # graph interactif 
+library(profvis) # profilage de code
 
-## 2 - Données  =========
+## 2 - Chargement Données  =========
 
 source("chargement_xp_finale.R")
 
@@ -32,11 +34,9 @@ source("chargement_xp_finale.R")
 
 summary(xp_total.shp)
 
-# une facteur pour les xp
-# ici on va prendre les mois des xp et les passer en facteur
-xp_total.shp$mois <- as.factor(lubridate::month(xp_total.shp$date))
 
-# nb de participants par xp
+# 1 Nombre de participants par xp ====================
+
 table(xp_total.shp$mois)
 
 xp_total.shp %>% 
@@ -59,40 +59,6 @@ xp_total.shp %>%
   # il me faut virer l'axes de x et le grid de x
   theme_bw()
 
-## 1 - Indicateurs Thierry  =========
-
-# distance parcourue
-# ici on va faire une distance à vole d'oiseau, il faut aussi prendre le point de départ qui est le mixeur
-
-# on fait un tableau point de départ 
-username <- unique(xp_total.shp$username)
-date <- rep(min(xp_total.shp$date) - 60, length(unique(xp_total.shp$username)))
-point_depart <- data.frame(username, date)
-
-# dont le point de départ est le mixeur
-st_geometry(point_depart) <- rep(mixeur.shp, length(username))
-
-# c'est un peu gourmant en ressource ces 400 calculs de distance pe pas optimisé
-# on obtient ainsi 400 distance en m dont la première est calculée par rapport au mixeur
-temp_dist <- xp_total.shp %>% 
-    # je suis passé en metre et pas en degré
-    st_transform(2154) %>% 
-    dplyr::select(username, date) %>% 
-    rbind(st_transform(point_depart,  2154)) %>% 
-    group_by(username) %>% 
-    # on part de la date min qui est celle definit dans point de départ 
-    arrange(date) %>% 
-    mutate(
-        # on ne peut pas passer un lag par contre on peut indexer une colonne 
-        lead = geometry[row_number() + 1],
-        # st_distance peut travailler par element
-        dist = st_distance(geometry, lead, by_element = T)
-    ) %>% 
-    # les NA sont un artefact que l'on peut virer
-    filter(!is.na(dist))
-
-# je le rajoute à xt_total.shp
-xp_total.shp$dist_m <- temp_dist$dist
 
 xp_summarize <- xp_total.shp %>% 
   st_drop_geometry() %>% 
@@ -149,7 +115,7 @@ xp_total.shp[xp_total.shp$username == "GradelerM", ]
 ## 3 - Effet par rapport à la densité arborée  ================
 
 
-# des arbres isolés dans aurait plus de chance d'etre pris ?
+# des arbres isolés aurait plus de chance d'etre pris ?
 # cf tilleuls 
 
 ## 4 - Effet par rapport à la diversité arborée  ================
