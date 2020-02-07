@@ -187,3 +187,42 @@ xp_bota.shp <- xp_bota.shp[zone.shp,]
 xp_bota.shp <- xp_bota.shp[,c(15, 1, 10, 2, 3, 4, 5, 6, 12, 13, 14, 8, 9, 17, 16, 11)]
 
 print("le nom du fichier de l'expérience du 26/06/2019 est xp_bota.shp")
+
+
+## 4 - Export vérification  ================
+
+### stream du json
+exp_brut <- stream_in(file("data/tracesBrutesStEtienne29_06_19.json"))
+
+### zone de l'xp
+zone.shp <- st_read("data/zone_se.shp") # ouverture du fichier de zone 
+# st_crs(zone.shp) # vérifie le le CRS de la couche
+# summary(zone.shp) # verif de base
+
+
+# il faut me virer (defuneste)  car je n'ai pas participé, juste montré directement sur mon tel parfois
+exp_brut <- exp_brut[exp_brut$username != "defuneste",]
+
+# correspondance entre champs 
+# activity$index : activity$name
+exp_brut$code_activ <- exp_brut$activity$index # avec un nom plus parlant
+exp_brut$code_activ <- exp_brut$code_activ+1
+
+validateObservation <- exp_brut[exp_brut$event == "validateObservation",]
+
+validateObservation.df <- validateObservation[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
+
+## 2 - Formatage et ajout de données ================
+# on met la bonne tz 
+attr(newObservation.df$date, "tzone") <- "Europe/Paris"
+
+#### c'est assez hideux mais je fais vite
+# on prend la date via une boucle, pe le changer 
+validateObservation$point <- NULL
+
+for(i in 1:length(validateObservation$event)) {
+    validateObservation.df$point[i] <- st_sfc(st_point(validateObservation$object[[i]]$location$coordinates))}
+
+validateObservation.shp <- st_sf(validateObservation.df, geom = validateObservation.df$point)
+validateObservation.shp <- validateObservation.shp %>% 
+                                select(-point)
