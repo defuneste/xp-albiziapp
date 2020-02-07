@@ -226,3 +226,4 @@ for(i in 1:length(validateObservation$event)) {
 validateObservation.shp <- st_sf(validateObservation.df, geom = validateObservation.df$point)
 validateObservation.shp <- validateObservation.shp %>% 
                                 select(-point)
+

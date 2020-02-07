@@ -21,18 +21,22 @@ source("chargement_xp_finale.R")
 
 # Statistiques générales descriptives
 
-Il y un total de 400 relevés pour 40 participants sur 3 expériences. Le tableau \@ref(tab:presentation) reprend le nombre de participants et nombre de relevés par expérimentation.  
+Il y un total de 400 relevés pour 40 participants sur 3 expériences. Le tableau \@ref(tab:presentation) reprend le nombre de participants et nombre de relevés par expérimentation.  "Nb_Plantages" est obtenu par PY en analysant les logs. Cette colonne indique le nombre d'arrets forcés d'Albiziapp (ai je bon/bien compris ?). 
 
 (ref:presentation) Tableau de synthese du nombre de participants et de relevés par expérimentation
 
 ```{r, presentation}
-knitr::kable(xp_total.shp %>% 
+presentation.dat <- xp_total.shp %>% 
     st_drop_geometry() %>% 
     group_by(mois) %>% 
-    summarize(nb_participants = n_distinct(username),
-              nb_releves = n() ),  caption = "(ref:presentation)")
+    summarize(Nb_participants = n_distinct(username),
+              Nb_releves = n())
+presentation.dat$Nb_plantages <- c("NA", 63, 766)
+knitr::kable(presentation.dat,   caption = "(ref:presentation)")
 
 ```
+ 
+
 
 La figure \@ref(fig:boxplotreleve) permet de comparer les distributions du nombre de relevés entre les trois expériences. 
 
