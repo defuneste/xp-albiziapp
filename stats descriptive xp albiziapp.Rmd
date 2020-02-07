@@ -13,6 +13,7 @@ output:
 ```{r, include=FALSE, message=FALSE}
 library(sf)
 library(dplyr)
+library(ggplot2)
 
 source("chargement_xp_finale.R")
 ```
@@ -20,14 +21,31 @@ source("chargement_xp_finale.R")
 
 # Statistiques générales descriptives
 
-Il y un total de 400 relevés pour 40 participants sur 3 expériences. 
+Il y un total de 400 relevés pour 40 participants sur 3 expériences. Le tableau \@ref(tab:presentation) reprend le nombre de participants et nombre de relevés par expérimentation.  
 
-```{r}
-xp_total.shp %>% 
+(ref:presentation) Tableau de synthese du nombre de participants et de relevés par expérimentation
+
+```{r, presentation}
+knitr::kable(xp_total.shp %>% 
     st_drop_geometry() %>% 
     group_by(mois) %>% 
     summarize(nb_participants = n_distinct(username),
-              nb_releves = n() )
+              nb_releves = n() ),  caption = "(ref:presentation)")
 
+```
+
+La figure \@ref(fig:boxplotreleve) permet de comparer les distributions du nombre de relevés entre les trois expériences. 
+
+```{r boxplotreleve, fig.align='center', fig.cap="Boite à moustaches du nombre de relevés par particpants et expérimentations"}
+xp_total.shp %>% 
+  st_drop_geometry() %>% 
+  group_by(Participant, mois) %>% 
+  dplyr::summarize(n = dplyr::n()) %>% 
+  ggplot(aes(y = n, color = mois)) +
+  geom_boxplot() + 
+  # ici je veux ajouter les points par dessus
+  labs(y = "nbr de relevés") +
+  # il me faut virer l'axes de x et le grid de x
+  theme_bw() 
 ```
 
