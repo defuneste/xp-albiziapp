@@ -214,7 +214,7 @@ validateObservation.df <- validateObservation[,c("username","date","code_activ")
 
 ## 2 - Formatage et ajout de données ================
 # on met la bonne tz 
-attr(newObservation.df$date, "tzone") <- "Europe/Paris"
+attr(validateObservation.df$date, "tzone") <- "Europe/Paris"
 
 #### c'est assez hideux mais je fais vite
 # on prend la date via une boucle, pe le changer 
@@ -227,3 +227,5 @@ validateObservation.shp <- st_sf(validateObservation.df, geom = validateObservat
 validateObservation.shp <- validateObservation.shp %>% 
                                 select(-point)
 
+
+str(validateObservation$object[[3]])

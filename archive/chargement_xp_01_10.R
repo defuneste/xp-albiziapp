@@ -124,3 +124,41 @@ xp_01_10_bota.shp <- transform(xp_01_10_bota.shp,Participant = as.numeric(factor
 xp_01_10_bota.shp <- xp_01_10_bota.shp[,c(15,1,16,2:11, 13,14,12)]
 
 print("le nom du fichier de l'expérience du 16/09/2019 est xp_01_10_bota.shp")
+
+
+## 5 - Export vérification  ================
+
+### stream du json
+history_brut <- stream_in(file("data/history_1octobre.json"))
+
+# ici il faut filtrer sur la date 
+
+attr(history_brut$date, "tzone") <- "Europe/Paris"
+
+# je filtre à partir du 15 à voir si c'est bon 
+history_01_10 <- subset(history_brut, date > ymd_hms("2019-09-30T00:00:00Z", tz = "Europe/Paris") )
+# ici il faut filtrer sur la date 
+
+# correspondance entre champs 
+# activity$index : activity$name
+history_01_10$code_activ <- history_01_10$activity$index # avec un nom plus parlant
+history_01_10$code_activ <- history_01_10$code_activ+1
+
+validateObservation <- history_01_10[history_01_10$event == "validateObservation",]
+
+validateObservation.df <- validateObservation[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
+
+
+#### c'est assez hideux mais je fais vite
+# on prend la date via une boucle, pe le changer 
+validateObservation$point <- NULL
+
+for(i in 1:length(validateObservation$event)) {
+  validateObservation.df$point[i] <- st_sfc(st_point(validateObservation$object[[i]]$location$coordinates))}
+
+validateObservation.shp <- st_sf(validateObservation.df, geom = validateObservation.df$point)
+validateObservation.shp <- validateObservation.shp %>% 
+  select(-point)
+
+
+str(validateObservation$object[[3]])
