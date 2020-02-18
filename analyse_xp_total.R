@@ -58,6 +58,7 @@ xp_total.shp %>%
   # il me faut virer l'axes de x et le grid de x
   theme_bw() 
 
+# je comprend pas la moustache du premier boxplot
 xp_total.shp %>% 
     st_drop_geometry() %>% 
     group_by(Participant, mois) %>% 
@@ -68,7 +69,6 @@ plot_ly(y = ~n, color = ~mois, type = "box")
 xp_summarize <- xp_total.shp %>% 
   st_drop_geometry() %>% 
   # on rajoute la distance    
-  mutate(dist_m = temp_dist$dist) %>% 
   group_by(username) %>% 
             # nombre de genre bon 
   dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
@@ -133,7 +133,6 @@ xp_total.shp[xp_total.shp$username == "GradelerM", ]
 xp_activite <- xp_total.shp %>% 
   st_drop_geometry() %>% 
   # on rajoute la distance    
-  mutate(dist_m = temp_dist$dist) %>% 
   group_by(username, code_activ) %>% 
   # nombre de genre bon 
   dplyr::summarize(indic_genre = sum(genre_bon, na.rm = T),
