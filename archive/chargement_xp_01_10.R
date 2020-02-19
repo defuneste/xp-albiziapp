@@ -144,6 +144,8 @@ history_01_10 <- subset(history_brut, date > ymd_hms("2019-09-30T00:00:00Z", tz 
 history_01_10$code_activ <- history_01_10$activity$index # avec un nom plus parlant
 history_01_10$code_activ <- history_01_10$code_activ+1
 
+## 5a - validateObservation  ================
+
 validateObservation <- history_01_10[history_01_10$event == "validateObservation",]
 
 validateObservation.df <- validateObservation[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
@@ -158,6 +160,27 @@ for(i in 1:length(validateObservation$event)) {
 
 validateObservation.shp <- st_sf(validateObservation.df, geom = validateObservation.df$point)
 validateObservation.shp <- validateObservation.shp %>% 
+  select(-point)
+
+
+str(validateObservation$object[[3]])
+
+## 5b - identification  ================
+
+identification <- history_01_10[history_01_10$event == "identification",]
+
+identification.df <- identification[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
+
+
+#### c'est assez hideux mais je fais vite
+# on prend la date via une boucle, pe le changer 
+identification.df$point <- NULL
+
+for(i in 1:length(identification$event)) {
+  identification.df$point[i] <- st_sfc(st_point(identification$object[[i]]$location$coordinates))}
+
+identification.shp <- st_sf(identification.df, geom = identification.df$point)
+identification.shp <- identification.shp %>% 
   select(-point)
 
 

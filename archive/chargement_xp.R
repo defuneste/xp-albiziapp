@@ -208,11 +208,12 @@ exp_brut <- exp_brut[exp_brut$username != "defuneste",]
 exp_brut$code_activ <- exp_brut$activity$index # avec un nom plus parlant
 exp_brut$code_activ <- exp_brut$code_activ+1
 
+
+## 4a - validateObservation ==============
 validateObservation <- exp_brut[exp_brut$event == "validateObservation",]
 
 validateObservation.df <- validateObservation[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
 
-## 2 - Formatage et ajout de données ================
 # on met la bonne tz 
 attr(validateObservation.df$date, "tzone") <- "Europe/Paris"
 
@@ -229,3 +230,26 @@ validateObservation.shp <- validateObservation.shp %>%
 
 
 str(validateObservation$object[[3]])
+
+## 4b - identifier ==============
+
+identifier <- exp_brut[exp_brut$event == "identification",]
+
+identifier.df <- identifier[,c("username","date","code_activ")] ## attention ici j'ai fait des selections par noms de colonnes
+
+# on met la bonne tz 
+attr(identifier.df$date, "tzone") <- "Europe/Paris"
+
+#### c'est assez hideux mais je fais vite
+# on prend la date via une boucle, pe le changer 
+identifier$point <- NULL
+
+for(i in 1:length(identifier$event)) {
+  identifier.df$point[i] <- st_sfc(st_point(identifier$object[[i]]$location$coordinates))}
+
+identifier.shp <- st_sf(identifier.df, geom = identifier.df$point)
+identifier.shp <- identifier.shp %>% 
+  select(-point)
+
+
+str(identifier$object[[4]])
