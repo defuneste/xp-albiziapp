@@ -2,9 +2,11 @@
 ## I. Chargement des données de l'xp v 11/2019 ====
 ##.#################################################################################33
 
+library(magrittr)
+
 # 1 - zone de l'xp ==================
 ### zone de l'xp
-zone.shp <- st_read("data/zone_se.shp") # ouverture du fichier de zone 
+zone.shp <- sf::st_read("data/zone_se.shp") # ouverture du fichier de zone 
 # st_crs(zone.shp) # vérifie le le CRS de la couche
 # summary(zone.shp) # verif de base
 
@@ -13,16 +15,16 @@ zone.shp <- zone.shp[zone.shp$id ==1, ] # il y avait deux zones à la base au fi
 zone.shp <- sf::st_transform(zone.shp, 2154) 
 
 # point de départ de l'experimentation 
-mixeur.shp <-st_sfc(st_point(c(4.3860717, 45.4496287)), crs = 4326) # localisation du mixeur
+mixeur.shp <-sf::st_sfc(sf::st_point(c(4.3860717, 45.4496287)), crs = 4326) # localisation du mixeur
 mixeur.shp <- sf::st_transform(mixeur.shp, 2154)
 
 # chargement des arbres que l'on connait 
 # ici il peut y avoir un gain de temps si je le sauve en RDS
 arbre_xp.shp <- sf::st_read("data/arbres_se_final.geojson")
-arbre_xp.shp <- st_transform(arbre_xp.shp, 2154)
+arbre_xp.shp <- sf::st_transform(arbre_xp.shp, 2154)
 # limité à la zone
 arbre_xp_zone.shp <- arbre_xp.shp[zone.shp,]
-str(arbre_xp_zone.shp)
+
 # correction de facteur en trop 
 arbre_xp_zone.shp$genus <- factor(arbre_xp_zone.shp$genus)
 arbre_xp_zone.shp$species <- factor(arbre_xp_zone.shp$species)
@@ -44,10 +46,12 @@ xp_total.shp$mois <- as.factor(lubridate::month(xp_total.shp$date))
 
 # etape 1 : on fait un tableau point de départ 
 username <- unique(xp_total.shp$username)
+# ici c'est pas bon tout les users ne sont pas de la meme expé 
 date <- rep(min(xp_total.shp$date) - 60, length(unique(xp_total.shp$username)))
 point_depart <- data.frame(username, date)
+
 # dont le point de départ est le mixeur
-st_geometry(point_depart) <- rep(mixeur.shp, length(username))
+sf::st_geometry(point_depart) <- rep(mixeur.shp, length(username))
 rm(username, date)
 
 
@@ -55,27 +59,27 @@ rm(username, date)
 # on obtient ainsi 400 distance en m dont la première est calculée par rapport au mixeur
 temp_dist <- xp_total.shp %>% 
     # je suis passé en metre et pas en degré
-    st_transform(2154) %>% 
+    sf::st_transform(2154) %>% 
     dplyr::select(username, date) %>% 
-    rbind(st_transform(point_depart,  2154)) %>% 
-    group_by(username) %>% 
+    rbind(sf::st_transform(point_depart,  2154)) %>% 
+    dplyr::group_by(username) %>% 
     # on part de la date min qui est celle definit dans point de départ 
-    arrange(date) %>% 
-    mutate(
+    dplyr::arrange(date) %>% 
+    dplyr::mutate(
         # on ne peut pas passer un lag par contre on peut indexer une colonne 
-        lead = geometry[row_number() + 1],
+        lead = geometry[dplyr::row_number() + 1],
         # st_distance peut travailler par element
-        dist = st_distance(geometry, lead, by_element = T)
+        dist = sf::st_distance(geometry, lead, by_element = T)
     ) %>% 
     # les NA sont un artefact que l'on peut virer
-    filter(!is.na(dist)) %>% 
+    dplyr::filter(!is.na(dist)) %>% 
     # j'ai reordonné
-    arrange(username, date)
+    dplyr::arrange(username, date)
 
 
 # rajout à xp_total.shp et meme reordonné
 xp_total.shp <- xp_total.shp %>% 
-    arrange(username, date)
+    dplyr::arrange(username, date)
 
 xp_total.shp$dist_m <- temp_dist$dist
 rm(temp_dist, point_depart)
